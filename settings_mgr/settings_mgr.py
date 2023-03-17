@@ -30,7 +30,7 @@ class SaveButtonOperator(bpy.types.Operator):
     
     def saveFile(self, context, filename, data):
         print('Saving file: ' + filename)
-        
+        print(data) # take a look!
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, sort_keys=True, ensure_ascii=True, indent=4)
         print('   Done!')
@@ -38,7 +38,6 @@ class SaveButtonOperator(bpy.types.Operator):
         context.scene.my_tool.message = msg
         print(msg)
         # bpy.ops.message.messagebox('INVOKE_DEFAULT', message = msg)
-        bpy.ops.message.messagebox('INVOKE_DEFAULT', message = msg)
         return {'FINISHED'}
 
     def readSettings(self, context, settings):
@@ -211,9 +210,10 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['workspace'] = {}
             settings['workspace']['options'] = {}
             settings['workspace']['options']['transform'] = {}
-            settings['workspace']['options']['transform']['context'] = bpy.context.space_data.context
             settings['workspace']['options']['transform']['use_transform_data_origin'] = bpy.context.scene.tool_settings.use_transform_data_origin
             settings['workspace']['options']['transform']['use_transform_pivot_point_align'] = bpy.context.scene.tool_settings.use_transform_pivot_point_align
+            settings['workspace']['options']['transform']['use_transform_skip_children'] = bpy.context.scene.tool_settings.use_transform_skip_children
+
             settings['workspace']['workspace'] = {}
             settings['workspace']['workspace']['use_pin_scene'] = bpy.data.workspaces["Scripting"].use_pin_scene
             settings['workspace']['workspace']['object_mode'] = bpy.data.workspaces["Scripting"].object_mode
@@ -301,26 +301,90 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['metadata']['use_stamp_note'] = bpy.context.scene.render.use_stamp_note
             settings['output_props']['metadata']['stamp_note_text'] = bpy.context.scene.render.stamp_note_text
             settings['output_props']['metadata']['use_stamp'] = bpy.context.scene.render.use_stamp
-            settings['output_props']['metadata']['stamp_font_size'] = bpy.context.scene.render.stamp_font_size
-            settings['output_props']['metadata']['stamp_foreground'] = bpy.context.scene.render.stamp_foreground
-            settings['output_props']['metadata']['stamp_background'] = bpy.context.scene.render.stamp_background
-            settings['output_props']['metadata']['use_stamp_labels'] = bpy.context.scene.render.use_stamp_labels
+            if bpy.context.scene.render.use_stamp == True:
+                settings['output_props']['metadata']['stamp_font_size'] = bpy.context.scene.render.stamp_font_size
+                settings['output_props']['metadata']['stamp_foreground'] = self.colorToString(bpy.context.scene.render.stamp_foreground)
+                settings['output_props']['metadata']['stamp_background'] = self.colorToString(bpy.context.scene.render.stamp_background)
+                settings['output_props']['metadata']['use_stamp_labels'] = bpy.context.scene.render.use_stamp_labels
+            settings['output_props']['post_processing'] = {}
+            settings['output_props']['post_processing']['use_compositing'] = bpy.context.scene.render.use_compositing = False
+            settings['output_props']['post_processing']['use_sequencer'] = bpy.context.scene.render.use_sequencer = False
+            settings['output_props']['post_processing']['dither_intensity'] = bpy.context.scene.render.dither_intensity = 0.776119
 
             # View Layer Properties
             settings['viewlayer_props'] = {}
             settings['viewlayer_props']['use'] = bpy.context.scene.view_layers["ViewLayer"].use
             settings['viewlayer_props']['use_single_layer'] = bpy.context.scene.render.use_single_layer
 
+            settings['viewlayer_props']['passes'] = {}
+            settings['viewlayer_props']['passes']['data'] = {}
+            settings['viewlayer_props']['passes']['data']['use_pass_combined'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_combined
+            settings['viewlayer_props']['passes']['data']['use_pass_z'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_z
+            settings['viewlayer_props']['passes']['data']['use_pass_mist'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_mist
+            settings['viewlayer_props']['passes']['data']['use_pass_position'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_position
+            settings['viewlayer_props']['passes']['data']['use_pass_normal'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_normal
+            settings['viewlayer_props']['passes']['data']['use_pass_vector'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_vector
+            settings['viewlayer_props']['passes']['data']['use_pass_uv'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_uv
+            # settings['viewlayer_props']['passes']['data']['use_denoising_data'] = bpy.data.scenes["Scene"].(null)
+            settings['viewlayer_props']['passes']['data']['use_pass_object_index'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_object_index
+            settings['viewlayer_props']['passes']['data']['use_pass_material_index'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_material_index
+            # settings['viewlayer_props']['passes']['data']['use_debug_sample_count'] = bpy.data.scenes["Scene"].(null)
+            settings['viewlayer_props']['passes']['data']['pass_alpha_threshold'] = bpy.context.scene.view_layers["ViewLayer"].pass_alpha_threshold
+            settings['viewlayer_props']['passes']['light'] = {}
+            settings['viewlayer_props']['passes']['light']['use_pass_diffuse_direct'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_diffuse_direct
+            settings['viewlayer_props']['passes']['light']['use_pass_diffuse_indirect'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_diffuse_indirect
+            settings['viewlayer_props']['passes']['light']['use_pass_diffuse_color'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_diffuse_color
+            settings['viewlayer_props']['passes']['light']['use_pass_glossy_direct'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_glossy_direct
+            settings['viewlayer_props']['passes']['light']['use_pass_glossy_indirect'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_glossy_indirect
+            settings['viewlayer_props']['passes']['light']['use_pass_glossy_color'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_glossy_color
+            settings['viewlayer_props']['passes']['light']['use_pass_transmission_direct'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_transmission_direct
+            settings['viewlayer_props']['passes']['light']['use_pass_transmission_indirect'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_transmission_indirect
+            settings['viewlayer_props']['passes']['light']['use_pass_transmission_color'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_transmission_color
+            # settings['viewlayer_props']['passes']['light']['use_pass_volume_direct'] = bpy.data.scenes["Scene"].(null)
+            # settings['viewlayer_props']['passes']['light']['use_pass_volume_indirect'] = bpy.data.scenes["Scene"].(null)
+            settings['viewlayer_props']['passes']['light']['use_pass_emit'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_emit
+            settings['viewlayer_props']['passes']['light']['use_pass_environment'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_environment
+            settings['viewlayer_props']['passes']['light']['use_pass_shadow'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_shadow
+            settings['viewlayer_props']['passes']['light']['use_pass_ambient_occlusion'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_ambient_occlusion
+            # settings['viewlayer_props']['passes']['light']['use_shadow_catcher'] = bpy.data.scenes["Scene"].(null)
+            settings['viewlayer_props']['passes']['cryptomatte'] = {}
+            settings['viewlayer_props']['passes']['cryptomatte']['use_pass_cryptomatte_object'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_cryptomatte_object
+            settings['viewlayer_props']['passes']['cryptomatte']['use_pass_cryptomatte_material'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_cryptomatte_material
+            settings['viewlayer_props']['passes']['cryptomatte']['use_pass_cryptomatte_asset'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_cryptomatte_asset
+            settings['viewlayer_props']['passes']['cryptomatte']['pass_cryptomatte_depth'] = bpy.context.scene.view_layers["ViewLayer"].pass_cryptomatte_depth
+            # settings['viewlayer_props']['passes']['shader_aov'] = {}
+            # settings['viewlayer_props']['passes']['light_groups'] = {}
+
+            settings['viewlayer_props']['filter'] = {}
+            settings['viewlayer_props']['filter']['use_sky'] = bpy.context.scene.view_layers["ViewLayer"].use_sky = False
+            settings['viewlayer_props']['filter']['use_solid'] = bpy.context.scene.view_layers["ViewLayer"].use_solid = False
+            settings['viewlayer_props']['filter']['use_strand'] = bpy.context.scene.view_layers["ViewLayer"].use_strand = False
+            settings['viewlayer_props']['filter']['use_volumes'] = bpy.context.scene.view_layers["ViewLayer"].use_volumes = False
+            settings['viewlayer_props']['filter']['use_motion_blur'] = bpy.context.scene.view_layers["ViewLayer"].use_motion_blur = False
+            # settings['viewlayer_props']['filter']['use_denoising'] = bpy.data.scenes["Scene"].(null)
+
+
+            settings['viewlayer_props']['override'] = {}
+            # settings['viewlayer_props']['override']['material_override'] = bpy.context.scene.view_layers["ViewLayer"].material_override
+            settings['viewlayer_props']['override']['samples'] = bpy.context.scene.view_layers["ViewLayer"].samples
+
             # Custom Properties - TBD - FUTURE
-            settings['viewlayer_props'] = {}
             settings['viewlayer_props']['custom_props'] = {}
 
             # Scene Properties
             settings['scene_props'] = {}
             settings['scene_props']['scene'] = {}
-            settings['scene_props']['scene']['camera'] = bpy.context.scene.camera
-            settings['scene_props']['scene']['background_set'] = bpy.context.scene.background_set
-            settings['scene_props']['scene']['active_clip'] = bpy.context.scene.active_clip # Is this right?
+            # I need to figure out how to serialize the camera. Value printed is:
+            # <bpy_struct, Object("Camera") at 0x000002EE7C60B908>
+            # settings['scene_props']['scene']['camera'] = bpy.context.scene.camera
+            # print('scene_props.scene.camera = ')
+            # print(bpy.context.scene.camera)
+            # print('*****************************')
+            # print('*****************************')
+            # print('*****************************')
+            # I suspect the following 2 lines will also fail 
+            # settings['scene_props']['scene']['background_set'] = bpy.context.scene.background_set
+            # settings['scene_props']['scene']['active_clip'] = bpy.context.scene.active_clip # Is this right?
             settings['scene_props']['units'] = {}
             settings['scene_props']['units']['system'] = bpy.context.scene.unit_settings.system
             settings['scene_props']['units']['scale_length'] = bpy.context.scene.unit_settings.scale_length
@@ -345,8 +409,36 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['scene_props']['custom_properties'] = {} # TBD FUTURE
             # World Properties
             settings['world_props'] = {}
-            settings['world_props']['viewport_display'] = {}
-            settings['world_props']['viewport_display']['color'] = bpy.context.scene.world.color
+            settings['world_props']['surface'] = {}
+            # TBD
+            # settings['world_props']['surface']['surface'] = bpy.data.worlds["World"].node_tree.nodes["Translucent BSDF"].inputs[0].default_value
+            # settings['world_props']['surface']['color'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value
+            # settings['world_props']['surface']['strength'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[1].default_value
+            settings['world_props']['volume'] = {}
+            settings['world_props']['mist_pass'] = {}
+            settings['world_props']['mist_pass']['start'] = bpy.context.scene.world.mist_settings.start
+            settings['world_props']['mist_pass']['depth'] = bpy.context.scene.world.mist_settings.depth
+            settings['world_props']['mist_pass']['falloff'] = bpy.context.scene.world.mist_settings.falloff
+            settings['world_props']['ray_visibility'] = {}
+            settings['world_props']['ray_visibility']['camera'] = bpy.context.scene.world.cycles_visibility.camera
+            settings['world_props']['ray_visibility']['diffuse'] = bpy.context.scene.world.cycles_visibility.diffuse
+            settings['world_props']['ray_visibility']['glossy'] = bpy.context.scene.world.cycles_visibility.glossy
+            settings['world_props']['ray_visibility']['transmission'] = bpy.context.scene.world.cycles_visibility.transmission
+            settings['world_props']['ray_visibility']['scatter'] = bpy.context.scene.world.cycles_visibility.scatter
+            settings['world_props']['settings'] = {}
+            settings['world_props']['settings']['surface'] = {}
+            settings['world_props']['settings']['surface']['sampling_method'] = bpy.context.scene.world.cycles.sampling_method
+            settings['world_props']['settings']['surface']['sample_map_resolution'] = bpy.context.scene.world.cycles.sample_map_resolution
+            settings['world_props']['settings']['surface']['max_bounces'] = bpy.context.scene.world.cycles.max_bounces
+            settings['world_props']['settings']['surface']['is_caustics_light'] = bpy.context.scene.world.cycles.is_caustics_light
+            settings['world_props']['settings']['volume'] = {}
+            settings['world_props']['settings']['volume']['volume_sampling'] = bpy.context.scene.world.cycles.volume_sampling
+            settings['world_props']['settings']['volume']['volume_interpolation'] = bpy.context.scene.world.cycles.volume_interpolation
+            settings['world_props']['settings']['volume']['homogeneous_volume'] = bpy.context.scene.world.cycles.homogeneous_volume
+            settings['world_props']['settings']['volume']['volume_step_size'] = bpy.context.scene.world.cycles.volume_step_size
+            settings['world_props']['settings']['light_group'] = {} # TBD FUTURE
+            settings['world_props']['settings']['viewport_display'] = {}
+            settings['world_props']['settings']['viewport_display']['color'] = self.colorToString(bpy.context.scene.world.color)
             settings['world_props']['custom_properties'] = {} # TBD FUTURE
 
             # Collection Properties
@@ -405,19 +497,28 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['sampling']['ambient_occlusion']['use_gtao_bent_normals'] = bpy.context.scene.eevee.use_gtao_bent_normals
             settings['render_props']['sampling']['ambient_occlusion']['use_gtao_bounce'] = bpy.context.scene.eevee.use_gtao_bounce
 
+            settings['render_props']['sampling']['bloom'] = {}
             settings['render_props']['sampling']['bloom']['use_bloom'] = bpy.context.scene.eevee.use_bloom
             settings['render_props']['sampling']['bloom']['bloom_threshold'] = bpy.context.scene.eevee.bloom_threshold
             settings['render_props']['sampling']['bloom']['bloom_knee'] = bpy.context.scene.eevee.bloom_knee
             settings['render_props']['sampling']['bloom']['bloom_radius'] = bpy.context.scene.eevee.bloom_radius
-            settings['render_props']['sampling']['bloom']['bloom_color'] = bpy.context.scene.eevee.bloom_color
+            settings['render_props']['sampling']['bloom']['bloom_color'] = self.colorToString(bpy.context.scene.eevee.bloom_color)
             settings['render_props']['sampling']['bloom']['bloom_intensity'] = bpy.context.scene.eevee.bloom_intensity
             settings['render_props']['sampling']['bloom']['bloom_clamp'] = bpy.context.scene.eevee.bloom_clamp
-
-
-
-
         # print(settings)
         print('   Done!')
+
+    # Convert a color from Blender into a string
+    def colorToString(self, color):
+        print('colorToString received:')
+        print(color)
+        # colorStr = '#%02x%02x%02x' % color
+        # print('colorStr = ' + colorStr)
+        colorStr = str(color[0]) + ',' + str(color[1]) + ',' + str(color[2])
+        print('colorStr2 = ' + colorStr)
+        result = '(' + colorStr + ')'
+        print('colorToString returning: ' + result)
+        return result
 
     
 # Get the operator for the button
@@ -472,23 +573,23 @@ class NPanel(bpy.types.Panel):
         row.operator(CompareButtonOperator.bl_idname, text="Compare To", icon='LINENUMBERS_ON')
     
 # I discovered this class at https://b3d.interplanety.org/en/creating-pop-up-panels-with-user-ui-in-blender-add-on/
-class MessageBox(bpy.types.Operator):
-    bl_idname = "message.messagebox"
-    bl_label = ""
+# class MessageBox(bpy.types.Operator):
+#     bl_idname = "message.messagebox"
+#     bl_label = ""
  
-    def execute(self, context):
-        # self.report({'INFO'}, self.message)
-        self.report({'INFO'}, context.scene.my_tool.message)
-        # print(self.message)
-        print(context.scene.my_tool.message)
-        return {'FINISHED'}
+#     def execute(self, context):
+#         # self.report({'INFO'}, self.message)
+#         self.report({'INFO'}, context.scene.my_tool.message)
+#         # print(self.message)
+#         print(context.scene.my_tool.message)
+#         return {'FINISHED'}
  
-    def invoke(self, context, event):
-        return context.window_manager.invoke_props_dialog(self, width = 400)
+#     def invoke(self, context, event):
+#         return context.window_manager.invoke_props_dialog(self, width = 400)
 
-    def draw(self, context):
-        # self.layout.label(self.message)
-        mymsg = context.scene.my_tool.message
-        self.layout.label(mymsg)
-        # context.scene.my_tool.message
-        self.layout.label("")
+#     def draw(self, context):
+#         # self.layout.label(self.message)
+#         mymsg = context.scene.my_tool.message
+#         self.layout.label(mymsg)
+#         # context.scene.my_tool.message
+#         self.layout.label("")

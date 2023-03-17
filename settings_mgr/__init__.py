@@ -26,7 +26,7 @@ bl_info = {
     "description": "Saves the Blender settings for easy loading in other projects",
     "warning": "Tested only with Blender v3.4.1",
     "doc_url": "",
-    "category": "",
+    "category": "System",
 }
 
 
@@ -328,7 +328,6 @@ class MyProperties(PropertyGroup):
 _classes = [
     settings_mgr.SaveButtonOperator,
     settings_mgr.CompareButtonOperator,
-    settings_mgr.MessageBox,
     MyProperties,
     settings_mgr.NPanel
 ]
