@@ -1,2 +1,4 @@
 settings_mgr_test.blend1
 test/test.json
+*.zip
+*.json
