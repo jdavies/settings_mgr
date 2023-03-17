@@ -1,0 +1,24 @@
+# Dev Notes
+
+## Updating the addon as a developer
+
+To quickly reload the changes you've made to the addon while testing:
+
+1. Save your file in Visual Code
+1. Execute the copyFile.bat file
+1. In Blender, press the Blender icon in the upper-left corner and select *System -> Reload Scripts*
+
+## Project File Structure
+
+The root folder holds the utility files for building the addon.
+**settings_mgr/** contains the source code.
+**test/** Contains scratchpad code I use for testing things in pure python. It has nothng to do with the addon.
+**copyFile.bat** simply copies the files into the Blender addon folder. See Updating the addon as a blender developer for it's use.
+
+## Comitting to Github
+
+Notes to myself since I always for get the details of this process!
+
+## Releasing the addon
+
+1. Update the version numbers in the **settings_mgr/__init__.py** and the **make.bat** files
