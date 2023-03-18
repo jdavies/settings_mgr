@@ -58,6 +58,12 @@ def reload_modules(name):
     from . import settings_mgr
     importlib.reload(settings_mgr)
 
+    from . import save_button_operator
+    importlib.reload(save_button_operator)
+
+    from . import load_button_operator
+    importlib.reload(load_button_operator)
+
     # from . import registration
     # importlib.reload(registration)
 
@@ -95,6 +101,8 @@ from random import randint
 from bpy.props import (StringProperty, PointerProperty)
 from bpy.types import (Panel, Operator, PropertyGroup)
 from . import settings_mgr
+from . import save_button_operator
+from . import load_button_operator
 
 print('Loading Settings Manager...')
 for p in sys.path:
@@ -109,9 +117,9 @@ class MyProperties(PropertyGroup):
         maxlen=1024,
         )
         
-    compare_filename: StringProperty(
-        name="CompareFile",
-        description="The name of the settings file you want to compare.",
+    load_filename: StringProperty(
+        name="LoadFile",
+        description="The name of the settings file you want to load.",
         default="",
         maxlen=1024
         )
@@ -326,8 +334,8 @@ class MyProperties(PropertyGroup):
 #=================================================
 
 _classes = [
-    settings_mgr.SaveButtonOperator,
-    settings_mgr.CompareButtonOperator,
+    save_button_operator.SaveButtonOperator,
+    load_button_operator.LoadButtonOperator,
     MyProperties,
     settings_mgr.NPanel
 ]
