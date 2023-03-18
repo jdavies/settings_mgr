@@ -14,7 +14,7 @@ class SaveButtonOperator(bpy.types.Operator):
     def execute(self, context):
         global data
 
-        fn = bpy.path.abspath("//" + context.scene.my_tool.filename + '.json')
+        fn = bpy.path.abspath("//" + context.scene.my_tool.save_filename + '.json')
         print('fn = ' + fn)
         ospath = os.path.basename(fn)
         print('os.path.basename = ' + ospath)

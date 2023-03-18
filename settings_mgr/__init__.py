@@ -1,6 +1,5 @@
 # ***** BEGIN GPL LICENSE BLOCK *****
 #
-#
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
@@ -20,7 +19,7 @@
 bl_info = {
     "name": "Settings Manager",
     "author": "Jeff Davies - Cybernautic Studios",
-    "version": (0, 0, 1),
+    "version": (0, 0, 2),
     "blender": (3, 4, 1),
     "location": "View3D",
     "description": "Saves the Blender settings for easy loading in other projects",
@@ -110,15 +109,15 @@ for p in sys.path:
     
 # Define our custom properties
 class MyProperties(PropertyGroup):
-    filename: StringProperty(
-        name="Filename",
+    save_filename: StringProperty(
+        name="Save As",
         description="The name of the settings file you want to save. Do not add a file extension",
         default="",
         maxlen=1024,
         )
         
     load_filename: StringProperty(
-        name="LoadFile",
+        name="Load File",
         description="The name of the settings file you want to load.",
         default="",
         maxlen=1024
@@ -129,6 +128,28 @@ class MyProperties(PropertyGroup):
         description = "message",
         default = ''
     )
+
+_classes = [
+    save_button_operator.SaveButtonOperator,
+    load_button_operator.LoadButtonOperator,
+    MyProperties,
+    settings_mgr.NPanel
+]
+
+def register():
+    for cls in _classes:
+        register_class(cls)
+    # Register our properties
+    bpy.types.Scene.my_tool = PointerProperty(type=MyProperties)
+
+
+def unregister():
+    for cls in _classes:
+        unregister_class(cls)
+
+
+if __name__ == "__main__":
+    register()
 
     
 #class AnimLayersSceneSettings(bpy.types.PropertyGroup):
@@ -332,30 +353,3 @@ class MyProperties(PropertyGroup):
 #=================================================
 #=================================================
 #=================================================
-
-_classes = [
-    save_button_operator.SaveButtonOperator,
-    load_button_operator.LoadButtonOperator,
-    MyProperties,
-    settings_mgr.NPanel
-]
-
-#def menu_func(self, context):
-#    self.layout.operator(SaveButtonOperator.bl_idname, text=SaveButtonOperator.bl_label)
-#    self.layout.operator(CompareButtonOperator.bl_idname, text=CompareButtonOperator.bl_label)
-
-def register():
-    for cls in _classes:
-        register_class(cls)
-    # Register our properties
-    bpy.types.Scene.my_tool = PointerProperty(type=MyProperties)
-
-
-def unregister():
-    for cls in _classes:
-        unregister_class(cls)
-    
-
-
-if __name__ == "__main__":
-    register()
