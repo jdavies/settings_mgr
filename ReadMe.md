@@ -11,6 +11,22 @@ across multiple Blender files. It helps in the following areas:
 
 Download and install the compiled version of the addon in the usual manner for Blender
 
+## Limitations
+
+Settings Manager does not save and load every single setting in your Blender file. Here are some types of settings that it will not handle:
+
+### No Plans for the Future
+
+1. Object Data - I have no plans to store object data in the future. That's what the .blend is for
+1. Scene cameras, backgrounds and other complex items - I do not plan to add these in the future
+
+### Possible Future Expansion
+
+I am considering adding the following to the Settings Manager addon in the future, expecially if there is any demand for it.
+
+1. Materials - I do plan to add materials, simply because that's where I sometimes come across problems when following tutorials.
+1. Textures
+
 ## Release Notes
 
 ### v0.0.1 - 2023-03-17
