@@ -66,6 +66,9 @@ def reload_modules(name):
     from . import operator_file_import
     importlib.reload(operator_file_import)
 
+    from . import updater
+    importlib.reload(updater)
+
     # from . import registration
     # importlib.reload(registration)
 
@@ -105,8 +108,11 @@ from bpy.types import (Panel, Operator, PropertyGroup)
 from . import settings_mgr
 from . import save_button_operator
 from . import load_button_operator
+from . import updater
 
 print('Loading Settings Manager...')
+print(bl_info)
+print("update avail: " + isUpdateAvailable("0.0.2"))
 for p in sys.path:
     print(p)
     

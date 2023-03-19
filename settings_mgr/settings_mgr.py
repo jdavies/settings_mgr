@@ -42,3 +42,4 @@ class NPanel(bpy.types.Panel):
 
     def execute(self, context):
         save_file = self.save_file_name
+        print("save_file = " + save_file)
