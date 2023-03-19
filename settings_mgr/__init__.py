@@ -63,6 +63,9 @@ def reload_modules(name):
     from . import load_button_operator
     importlib.reload(load_button_operator)
 
+    from . import operator_file_import
+    importlib.reload(operator_file_import)
+
     # from . import registration
     # importlib.reload(registration)
 
@@ -132,6 +135,7 @@ class MyProperties(PropertyGroup):
 _classes = [
     save_button_operator.SaveButtonOperator,
     load_button_operator.LoadButtonOperator,
+    operator_file_import.ImportSomeData,
     MyProperties,
     settings_mgr.NPanel
 ]

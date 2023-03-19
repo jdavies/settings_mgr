@@ -13,31 +13,46 @@ class SaveButtonOperator(bpy.types.Operator):
         
     def execute(self, context):
         global data
+        # Clean up the file names
+        curDir = bpy.path.abspath("//")
 
-        fn = bpy.path.abspath("//" + context.scene.my_tool.save_filename + '.json')
-        print('fn = ' + fn)
-        ospath = os.path.basename(fn)
-        print('os.path.basename = ' + ospath)
-        bpypath = bpy.path.basename(fn)
-        print('bpy.path.basename = ' + bpypath)
+        # Does any directory info exist in the current save file name?
+        osdir = os.path.dirname(context.scene.my_tool.save_filename)
+        # print('os.path.dirname RAW = ' + osdir)
+        if(osdir == ''):
+            # No directory information is given. Assume the local directory for the file
+            # print("osdir == ''")
+            context.scene.my_tool.save_filename = "//" + context.scene.my_tool.save_filename
+
+        if(context.scene.my_tool.save_filename.startswith('//')):
+            # They are already using the shorthand for the local file directory.
+            # Make no changes!
+            fn = bpy.path.abspath(context.scene.my_tool.save_filename)
+        elif(context.scene.my_tool.save_filename.startswith(curDir)):
+            # They are using the fully qualified path name. Shorten it in the property
+            context.scene.my_tool.save_filename = context.scene.my_tool.save_filename.replace(curDir, '//')
+            fn = bpy.path.abspath(context.scene.my_tool.save_filename)
+        else:
+            # Looks like a different directory has been specified
+            fn = bpy.path.abspath(context.scene.my_tool.save_filename)
+
+        # print('fn = ' + fn)
         fn = bpy.path.ensure_ext(fn, '.json', case_sensitive=False)
-        print('adj filename = ' + fn)
+        # print('adj filename = ' + fn)
 
         self.readSettings(context, self.data)
-        print('About to call saveFile: ' + fn)
+        # print('About to call saveFile: ' + fn)
         self.saveFile(context, fn, self.data)
         return {'FINISHED'}
     
     def saveFile(self, context, filename, data):
-        print('Saving file: ' + filename)
-        print(data) # take a look!
+        # print('Saving file: ' + filename)
+        # print(data) # take a look!
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(data, f, sort_keys=True, ensure_ascii=True, indent=4)
-        print('   Done!')
+        # print('   Done!')
         msg = 'Saved as: ' + filename
-        context.scene.my_tool.message = msg
-        print(msg)
-        # bpy.ops.message.messagebox('INVOKE_DEFAULT', message = msg)
+        self.report({'INFO'}, msg)
         return {'FINISHED'}
 
     def readSettings(self, context, settings):
