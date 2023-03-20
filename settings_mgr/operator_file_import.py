@@ -10,32 +10,43 @@ from bpy.types import Operator
 # Cleanup the filename to match Blender standards (ie use // as the filename
 # prefix if it is stored in the same directory ad the main Blender file.)
 def cleanupFileName(origFileName):
+    print('cleanupFileName starting with ' + origFileName)
     # Clean up the file names
-        curDir = bpy.path.abspath("//")
+    curDir = bpy.path.abspath("//")
+    if(curDir == ''):
+        # The current file has not been saved!
+        # Set it to the orginal file name
+        curDir = origFileName
+    print('cleanupFileName curDir = ' + curDir)
+    # Does any directory info exist in the current save file name?
+    osdir = os.path.dirname(origFileName)
+    print('os.path.dirname RAW = ' + osdir)
+    if(osdir == ''):
 
-        # Does any directory info exist in the current save file name?
-        osdir = os.path.dirname(origFileName)
-        # print('os.path.dirname RAW = ' + osdir)
-        if(osdir == ''):
-            # No directory information is given. Assume the local directory for the file
-            # print("osdir == ''")
-            fn = "//" + origFileName
+        # No directory information is given. Assume the local directory for the file
+        # print("osdir == ''")
+        fn = "//" + origFileName
+        print('cleanupFileName osdir is empty! ' + fn)
 
-        if(origFileName.startswith('//')):
-            # They are already using the shorthand for the local file directory.
-            # Make no changes!
-            fn = bpy.path.abspath(origFileName)
-        elif(origFileName.startswith(curDir)):
-            # They are using the fully qualified path name. Shorten it in the property
-            fn = origFileName.replace(curDir, '//')
-        else:
-            # Looks like a different directory has been specified
-            fn = bpy.path.abspath(origFileName)
+    if(origFileName.startswith('//')):
+        # They are already using the shorthand for the local file directory.
+        # Make no changes!
+        fn = bpy.path.abspath(origFileName)
+    elif(origFileName.startswith(curDir)):
+        # They are using the fully qualified path name. Shorten it in the property
+        fn = origFileName.replace(curDir, '//')
+        print('cleanupFileName replacing curDir with // ')
+        print('   cleanupFileName origFileName = ' + origFileName)
+        print('   cleanupFileName fn = ' + fn)
+    else:
+        # Looks like a different directory has been specified
+        fn = bpy.path.abspath(origFileName)
 
-        # print('fn = ' + fn)
-        fn = bpy.path.ensure_ext(fn, '.json', case_sensitive=False)
-        # print('adj filename = ' + fn)
-        return fn
+    # print('fn = ' + fn)
+    fn = bpy.path.ensure_ext(fn, '.json', case_sensitive=False)
+    print('cleanupFileName returning ' + fn)
+    # print('adj filename = ' + fn)
+    return fn
 
 
 class ImportSomeData(Operator, ImportHelper):
@@ -82,23 +93,21 @@ class ImportSomeData(Operator, ImportHelper):
 
     def read_some_data(self, context, filepath, use_some_setting):
         print("running read_some_data...")
-        fn = cleanupFileName(filepath)
-        # f = open(filepath, 'r', encoding='utf-8')
-        print(fn)
-        scene = context.scene
-        my_props = scene.my_props
-        if(self.isSaveFile):
-            print('Save file name = ' + fn)
-            my_props.save_filename = fn
+        curDir = bpy.path.abspath("//")
+        if(curDir == ''):
+            # This file has never been saved. Report the error
+            self.report({'INFO'}, 'You must SAVE the file first!')
         else:
-            print('Load file name = ' + fn)
-            my_props.load_filename = fn
-
-        # data = f.read()
-        # f.close()
-
-        # would normally load the data here
-        # print(data)
+            fn = cleanupFileName(filepath)
+            print(fn)
+            scene = context.scene
+            my_props = scene.my_props
+            if(self.isSaveFile):
+                print('Save file name = ' + fn)
+                my_props.save_filename = fn
+            else:
+                print('Load file name = ' + fn)
+                my_props.load_filename = fn
 
         return {'FINISHED'}
 

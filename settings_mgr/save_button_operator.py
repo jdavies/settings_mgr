@@ -17,24 +17,24 @@ class SaveButtonOperator(bpy.types.Operator):
         curDir = bpy.path.abspath("//")
 
         # Does any directory info exist in the current save file name?
-        osdir = os.path.dirname(context.scene.my_tool.save_filename)
+        osdir = os.path.dirname(context.scene.my_props.save_filename)
         # print('os.path.dirname RAW = ' + osdir)
         if(osdir == ''):
             # No directory information is given. Assume the local directory for the file
             # print("osdir == ''")
-            context.scene.my_tool.save_filename = "//" + context.scene.my_tool.save_filename
+            context.scene.my_props.save_filename = "//" + context.scene.my_props.save_filename
 
-        if(context.scene.my_tool.save_filename.startswith('//')):
+        if(context.scene.my_props.save_filename.startswith('//')):
             # They are already using the shorthand for the local file directory.
             # Make no changes!
-            fn = bpy.path.abspath(context.scene.my_tool.save_filename)
-        elif(context.scene.my_tool.save_filename.startswith(curDir)):
+            fn = bpy.path.abspath(context.scene.my_props.save_filename)
+        elif(context.scene.my_props.save_filename.startswith(curDir)):
             # They are using the fully qualified path name. Shorten it in the property
-            context.scene.my_tool.save_filename = context.scene.my_tool.save_filename.replace(curDir, '//')
-            fn = bpy.path.abspath(context.scene.my_tool.save_filename)
+            context.scene.my_props.save_filename = context.scene.my_props.save_filename.replace(curDir, '//')
+            fn = bpy.path.abspath(context.scene.my_props.save_filename)
         else:
             # Looks like a different directory has been specified
-            fn = bpy.path.abspath(context.scene.my_tool.save_filename)
+            fn = bpy.path.abspath(context.scene.my_props.save_filename)
 
         # print('fn = ' + fn)
         fn = bpy.path.ensure_ext(fn, '.json', case_sensitive=False)

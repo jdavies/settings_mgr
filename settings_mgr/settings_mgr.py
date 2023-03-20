@@ -82,7 +82,7 @@ class NPanel(bpy.types.Panel):
 
         row = box.row()
         row.prop(my_props, "load_pref_output_postprocessing")
-        row.prop(my_props, "load_pref_output_steroscopy")
+        row.prop(my_props, "load_pref_output_stereoscopy")
 
         row = box.row()
         row.operator(LoadButtonOperator.bl_idname, text="Load Settings", icon='LINENUMBERS_ON')

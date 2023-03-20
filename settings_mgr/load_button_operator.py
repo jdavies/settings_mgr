@@ -11,7 +11,7 @@ class LoadButtonOperator(bpy.types.Operator):
     data = {}
 
     def execute(self, context):
-        filename = context.scene.my_tool.load_filename
+        filename = context.scene.my_props.load_filename
         self.readJSONFile(context, filename)
         self.applyData(context)
         return {'FINISHED'}
@@ -21,6 +21,8 @@ class LoadButtonOperator(bpy.types.Operator):
         filename = bpy.path.ensure_ext(filename, '.json', case_sensitive=False)
         print('loading the file: ' + filename + '...')
         # DO LOAD HERE
+        filename = curDir = bpy.path.abspath(filename) ## In case it starts wth //
+        print('loading the file: ' + filename + '...')
         f = open(filename, 'r')
         self.data = json.load(f)
         f.close()
@@ -38,10 +40,10 @@ class LoadButtonOperator(bpy.types.Operator):
             # Metadata
             if(self.data['render_props']['engine'] == 'CYCLES'):
                 # Load the Cycles self.data
-                loadCycles(context)
+                self.loadCycles(context)
             else:
                 # Load the EEVEE self.data
-                loadEevee(context)
+                self.loadEevee(context)
             if(self.data['output_props']['metadata']['use_stamp_note']):
                 bpy.context.scene.render.use_stamp_note = True
                 bpy.context.scene.render.stamp_note_text = self.data['output_props']['metadata']['stamp_note_text']
@@ -57,8 +59,8 @@ class LoadButtonOperator(bpy.types.Operator):
         # =================
         # Always load the core Render Properties
         context.scene.render.engine = self.data['render_props']['engine']
-        context.scene.render.device = self.data['render_props']['device']
-        context.scene.render.feature_set = self.data['render_props']['feature_set']
+        context.scene.cycles.device = self.data['render_props']['device']
+        context.scene.cycles.feature_set = self.data['render_props']['feature_set']
         # Bake
         bpy.context.scene.render.use_bake_multires = self.data['render_props']['bake']['use_bake_multires']
         bpy.context.scene.render.bake_type = self.data['render_props']['bake']['bake_type']
@@ -67,13 +69,13 @@ class LoadButtonOperator(bpy.types.Operator):
         bpy.context.scene.render.bake_margin_type = self.data['render_props']['bake']['margin']['bake_margin_type']
         bpy.context.scene.render.bake_margin = self.data['render_props']['bake']['margin']['bake_margin']
         # Color Management
-        bpy.context.scene.display_self.data.display_device = self.data['render_props']['self.data_management']['display_device']
-        bpy.context.scene.view_self.data.view_transform = self.data['render_props']['self.data_management']['view_transform']
-        bpy.context.scene.view_self.data.look = self.data['render_props']['self.data_management']['look']
-        bpy.context.scene.view_self.data.exposure = self.data['render_props']['self.data_management']['exposure']
-        bpy.context.scene.view_self.data.gamma = self.data['render_props']['self.data_management']['gamma']
-        bpy.context.scene.sequencer_self.dataspace_self.data.name = self.data['render_props']['self.data_management']['name']
-        bpy.context.scene.view_self.data.use_curve_mapping = self.data['render_props']['self.data_management']['curves']['use_curve_mapping']
+        bpy.context.scene.display_settings.display_device = self.data['render_props']['color_management']['display_device']
+        bpy.context.scene.view_settings.view_transform = self.data['render_props']['color_management']['view_transform']
+        bpy.context.scene.view_settings.look = self.data['render_props']['color_management']['look']
+        bpy.context.scene.view_settings.exposure = self.data['render_props']['color_management']['exposure']
+        bpy.context.scene.view_settings.gamma = self.data['render_props']['color_management']['gamma']
+        bpy.context.scene.sequencer_colorspace_settings.name = self.data['render_props']['color_management']['name']
+        bpy.context.scene.view_settings.use_curve_mapping = self.data['render_props']['color_management']['curves']['use_curve_mapping']
         # Curves
         bpy.context.scene.cycles_curves.shape = self.data['render_props']['curves']['shape']
         bpy.context.scene.cycles_curves.subdivision = self.data['render_props']['curves']['subdivisions']
