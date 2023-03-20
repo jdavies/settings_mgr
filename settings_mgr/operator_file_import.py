@@ -86,13 +86,13 @@ class ImportSomeData(Operator, ImportHelper):
         # f = open(filepath, 'r', encoding='utf-8')
         print(fn)
         scene = context.scene
-        mytool = scene.my_tool
+        my_props = scene.my_props
         if(self.isSaveFile):
             print('Save file name = ' + fn)
-            mytool.save_filename = fn
+            my_props.save_filename = fn
         else:
             print('Load file name = ' + fn)
-            mytool.load_filename = fn
+            my_props.load_filename = fn
 
         # data = f.read()
         # f.close()
