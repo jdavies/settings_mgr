@@ -13,9 +13,10 @@ class LoadButtonOperator(bpy.types.Operator):
     def execute(self, context):
         filename = context.scene.my_tool.load_filename
         self.readJSONFile(context, filename)
-        self.applyData()
+        self.applyData(context)
         return {'FINISHED'}
     
+    # Reads the JSON file into the class-level data object
     def readJSONFile(self, context, filename):
         filename = bpy.path.ensure_ext(filename, '.json', case_sensitive=False)
         print('loading the file: ' + filename + '...')
@@ -27,24 +28,57 @@ class LoadButtonOperator(bpy.types.Operator):
         print(self.data)
         print('File Loaded and applied')
 
-    def applyData(self):
-        # Metadata
-        context.scene.render.engine = self.data['render_props']['engine']
-        if(self.data['render_props']['engine'] == 'CYCLES'):
-            # Load the Cycles settings
-            loadCycles()
-        else:
-            # Load the EEVEE settings
-            loadEevee()
-        if(self.data['output_props']['metadata']['use_stamp_note']):
-            bpy.context.scene.render.use_stamp_note = True
-            bpy.context.scene.render.stamp_note_text = self.data['output_props']['metadata']['stamp_note_text']
-            x = self.data['output_props']['metadata']['stamp_note_text']
-        print('applyData() x = ' + x)
+    # Now that the data is loaded into our class variable. We can apply
+    # the selected portions to the current file
+    def applyData(self, context):
+        scene = context.scene
+        my_props = scene.my_props
 
-    def loadCycles(self):
+        if(my_props.load_pref_output_metadata == True):
+            # Metadata
+            if(self.data['render_props']['engine'] == 'CYCLES'):
+                # Load the Cycles self.data
+                loadCycles(context)
+            else:
+                # Load the EEVEE self.data
+                loadEevee(context)
+            if(self.data['output_props']['metadata']['use_stamp_note']):
+                bpy.context.scene.render.use_stamp_note = True
+                bpy.context.scene.render.stamp_note_text = self.data['output_props']['metadata']['stamp_note_text']
+                x = self.data['output_props']['metadata']['stamp_note_text']
+        print('applyData() complete!')
+
+    def loadCycles(self, context):
+        scene = context.scene
+        my_props = scene.my_props
+
+        # =================
+        # Render Properties
+        # =================
+        # Always load the core Render Properties
+        context.scene.render.engine = self.data['render_props']['engine']
         context.scene.render.device = self.data['render_props']['device']
         context.scene.render.feature_set = self.data['render_props']['feature_set']
+        # Bake
+        bpy.context.scene.render.use_bake_multires = self.data['render_props']['bake']['use_bake_multires']
+        bpy.context.scene.render.bake_type = self.data['render_props']['bake']['bake_type']
+        bpy.context.scene.render.use_bake_clear = self.data['render_props']['bake']['output']['use_bake_clear']
+        bpy.context.scene.render.use_bake_lores_mesh = self.data['render_props']['bake']['output']['use_bake_lores_mesh']
+        bpy.context.scene.render.bake_margin_type = self.data['render_props']['bake']['margin']['bake_margin_type']
+        bpy.context.scene.render.bake_margin = self.data['render_props']['bake']['margin']['bake_margin']
+        # Color Management
+        bpy.context.scene.display_self.data.display_device = self.data['render_props']['self.data_management']['display_device']
+        bpy.context.scene.view_self.data.view_transform = self.data['render_props']['self.data_management']['view_transform']
+        bpy.context.scene.view_self.data.look = self.data['render_props']['self.data_management']['look']
+        bpy.context.scene.view_self.data.exposure = self.data['render_props']['self.data_management']['exposure']
+        bpy.context.scene.view_self.data.gamma = self.data['render_props']['self.data_management']['gamma']
+        bpy.context.scene.sequencer_self.dataspace_self.data.name = self.data['render_props']['self.data_management']['name']
+        bpy.context.scene.view_self.data.use_curve_mapping = self.data['render_props']['self.data_management']['curves']['use_curve_mapping']
+        # Curves
+        bpy.context.scene.cycles_curves.shape = self.data['render_props']['curves']['shape']
+        bpy.context.scene.cycles_curves.subdivision = self.data['render_props']['curves']['subdivisions']
+        bpy.context.scene.render.hair_type = self.data['render_props']['curves']['viewport_display']['hair_type']
+        bpy.context.scene.render.hair_subdiv = self.data['render_props']['curves']['viewport_display']['hair_subdiv']
         # Film
         bpy.context.scene.cycles.film_exposure = self.data['render_props']['film']['film_exposure']
         bpy.context.scene.cycles.pixel_filter_type = self.data['render_props']['film']['pixel_filter']['pixel_filter_type']
@@ -54,6 +88,17 @@ class LoadButtonOperator(bpy.types.Operator):
             bpy.context.scene.render.film_transparent = self.data['render_props']['film']['transparent']['film_transparent']
             bpy.context.scene.cycles.film_transparent_glass = self.data['render_props']['film']['transparent']['film_transparent_glass']
             bpy.context.scene.cycles.film_transparent_roughness = self.data['render_props']['film']['transparent']['film_transparent_roughness']
+        # Render Properties - Freestyle
+        bpy.context.scene.render.use_freestyle = self.data['render_props']['freestyle']['use_freestyle']
+        bpy.context.scene.render.line_thickness_mode = self.data['render_props']['freestyle']['line_thickness_mode']
+        bpy.context.scene.render.line_thickness = self.data['render_props']['freestyle']['line_thickness']
+        # Render Properties - Grease Pencil
+        # Render Properties - Light Paths
+        # Render Properties - Motion Blue
+        # Render Properties - Performance
+        # Render Properties - Sampling
+        # Render Properties - Simplify
+        # Render Properties - Volumes
 
     def loadEevee(self):
         self.data['render_props']['engine']
