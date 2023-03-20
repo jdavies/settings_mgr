@@ -22,23 +22,70 @@ class NPanel(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
         # obj = context.object
-        mytool = scene.my_tool
+        my_props = scene.my_props
         
-        row = layout.row()
-        #layout.prop(mytool, "save_filename")
-        row.prop(mytool, "save_filename")
-
-        row = layout.row()
-        row.operator(SaveButtonOperator.bl_idname, text="Save Settings", icon='GREASEPENCIL')
+        # Save file section
+        box = layout.box()
+        box.label(text = "Save Settings")
+        #layout.prop(my_props, "save_filename")
+        row = box.row()
+        row.prop(my_props, "save_filename")
         saveFileOp = row.operator(ImportSomeData.bl_idname, text="", icon='FILEBROWSER')
         saveFileOp.isSaveFile = True
+        box.operator(SaveButtonOperator.bl_idname, text="Save Settings", icon='GREASEPENCIL')
 
         # Load File
-        layout.prop(mytool, "load_filename")
-        row = layout.row()
-        row.operator(LoadButtonOperator.bl_idname, text="Load Settings", icon='LINENUMBERS_ON')
+        box = layout.box()
+        box.label(text = "Load Settings")
+        row = box.row()
+        row.prop(my_props, "load_filename")
         loadFileOp = row.operator(ImportSomeData.bl_idname, text="", icon='FILEBROWSER')
-        loadFileOp.isSaveFile = False
+        loadFileOp.isSaveFile = False   # False = We are loading data
+        row = box.row()
+        box.label(text = "Render Properties")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_render_bake")
+        row.prop(my_props, "load_pref_render_colormanagement")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_render_curves")
+        row.prop(my_props, "load_pref_render_film")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_render_freestyle")
+        row.prop(my_props, "load_pref_render_greasepencil")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_render_lightpaths")
+        row.prop(my_props, "load_pref_render_motionblur")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_render_performance")
+        row.prop(my_props, "load_pref_render_sampling")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_render_simplify")
+        row.prop(my_props, "load_pref_render_volumes")
+
+
+        # Output Props
+        row = box.row()
+        box.label(text = "Output Properties")
+        row = box.row()
+        row.prop(my_props, "load_pref_output_format")
+        row.prop(my_props, "load_pref_output_frame_range")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_output_metadata")
+        row.prop(my_props, "load_pref_output_output")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_output_postprocessing")
+        row.prop(my_props, "load_pref_output_steroscopy")
+
+        row = box.row()
+        row.operator(LoadButtonOperator.bl_idname, text="Load Settings", icon='LINENUMBERS_ON')
 
     def execute(self, context):
         save_file = self.save_file_name
