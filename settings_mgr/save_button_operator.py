@@ -214,7 +214,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['color_management']['name'] = bpy.context.scene.sequencer_colorspace_settings.name
             settings['render_props']['color_management']['curves'] = {}
             settings['render_props']['color_management']['curves']['use_curve_mapping'] = bpy.context.scene.view_settings.use_curve_mapping
-            # curve data no working yet. Same code for black and white levels
+            # curve data not working yet. Same code for black and white levels
             # settings['render_props']['color_management']['curves']['black_level'] = {}
             # settings['render_props']['color_management']['curves']['white_level'] = {}
             # settings['render_props']['color_management']['curves']['black_level']['red'] = bpy.data.scenes["Scene"].(null)[0]
