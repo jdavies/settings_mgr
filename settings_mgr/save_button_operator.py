@@ -41,7 +41,7 @@ class SaveButtonOperator(bpy.types.Operator):
         # print('adj filename = ' + fn)
 
         self.readSettings(context, self.data)
-        # print('About to call saveFile: ' + fn)
+        print('About to call saveFile: ' + fn)
         self.saveFile(context, fn, self.data)
         return {'FINISHED'}
     
@@ -62,9 +62,13 @@ class SaveButtonOperator(bpy.types.Operator):
         settings['render_props'] = {}
         settings['render_props']['engine'] = context.scene.render.engine
         if settings['render_props']['engine'] == 'CYCLES':
+            print("Reading cycles values...")
+            #====================
+            # Render Properties
+            #====================
             settings['render_props']['feature_set'] = bpy.context.scene.cycles.feature_set
             settings['render_props']['device'] = bpy.context.scene.cycles.device
-            # Sampling
+            # Render Properties - Sampling
             settings['render_props']['sampling'] = {}
             settings['render_props']['sampling']['viewport'] = {}
             settings['render_props']['sampling']['viewport']['use_preview_adaptive_sampling'] = bpy.context.scene.cycles.use_preview_adaptive_sampling
@@ -94,7 +98,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['sampling']['advanced']['min_light_bounces'] = bpy.context.scene.cycles.min_light_bounces
             settings['render_props']['sampling']['advanced']['min_transparent_bounces'] = bpy.context.scene.cycles.min_transparent_bounces
             settings['render_props']['sampling']['advanced']['light_sampling_threshold'] = bpy.context.scene.cycles.light_sampling_threshold
-            # Light Paths
+            # Render Properties =- Light Paths
             settings['render_props']['light_paths'] = {}
             settings['render_props']['light_paths']['max_bounces'] = {}
             settings['render_props']['light_paths']['max_bounces']['total'] = bpy.context.scene.cycles.max_bounces
@@ -115,19 +119,19 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['light_paths']['fast_gi']['fast_gi_method'] = bpy.context.scene.cycles.fast_gi_method
             settings['render_props']['light_paths']['fast_gi']['ao_factor'] = bpy.context.scene.world.light_settings.ao_factor
             settings['render_props']['light_paths']['fast_gi']['distance'] = bpy.context.scene.world.light_settings.distance
-            # Volumes
+            # Render Properties - Volumes
             settings['render_props']['volumes'] = {}
             settings['render_props']['volumes']['volume_step_rate'] = bpy.context.scene.cycles.volume_step_rate
             settings['render_props']['volumes']['volume_preview_step_rate'] = bpy.context.scene.cycles.volume_preview_step_rate
             settings['render_props']['volumes']['volume_max_steps'] = bpy.context.scene.cycles.volume_max_steps
-            #Curves
+            # Render Properties - Curves
             settings['render_props']['curves'] = {}
             settings['render_props']['curves']['shape'] = bpy.context.scene.cycles_curves.shape
             settings['render_props']['curves']['subdivisions'] = bpy.context.scene.cycles_curves.subdivisions
             settings['render_props']['curves']['viewport_display'] = {}
             settings['render_props']['curves']['viewport_display']['hair_type'] = bpy.context.scene.render.hair_type
             settings['render_props']['curves']['viewport_display']['hair_subdiv'] = bpy.context.scene.render.hair_subdiv
-            # Simplify
+            # Render Properties - Simplify
             settings['render_props']['simplify'] = {}
             settings['render_props']['simplify']['use_simplify'] = bpy.context.scene.render.use_simplify
             settings['render_props']['simplify']['viewport'] = {}
@@ -151,7 +155,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['simplify']['grease_pencil']['simplify_gpencil_shader_fx'] = bpy.context.scene.render.simplify_gpencil_shader_fx
             settings['render_props']['simplify']['grease_pencil']['simplify_gpencil_tint'] = bpy.context.scene.render.simplify_gpencil_tint
             settings['render_props']['simplify']['grease_pencil']['simplify_gpencil_antialiasing'] = bpy.context.scene.render.simplify_gpencil_antialiasing
-            # Motion Blur
+            # Render Properties - Motion Blur
             settings['render_props']['motion_blur'] = {}
             settings['render_props']['motion_blur']['use_motion_blur'] = bpy.context.scene.render.use_motion_blur = True
             settings['render_props']['motion_blur']['motion_blur_position'] = bpy.context.scene.cycles.motion_blur_position = 'CENTER'
@@ -160,7 +164,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['motion_blur']['rolling_shutter_duration'] = bpy.context.scene.cycles.rolling_shutter_duration = 0.2
             settings['render_props']['motion_blur']['shutter_curve'] = {} # not available ATM
 
-            # Film
+            # Render Properties - Film
             settings['render_props']['film'] = {}
             settings['render_props']['film']['film_exposure'] = bpy.context.scene.cycles.film_exposure
             settings['render_props']['film']['pixel_filter'] = {}
@@ -172,7 +176,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['film']['transparent']['film_transparent_glass'] = bpy.context.scene.cycles.film_transparent_glass
             settings['render_props']['film']['transparent']['film_transparent_roughness'] = bpy.context.scene.cycles.film_transparent_roughness
 
-            # Performance
+            # Render Properties - Performance
             settings['render_props']['performance'] = {}
             settings['render_props']['performance']['threads'] = {}
             settings['render_props']['performance']['threads']['threads_mode'] = bpy.context.scene.render.threads_mode
@@ -184,8 +188,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['performance']['final_render']['use_persistent_data'] = bpy.context.scene.render.use_persistent_data
             settings['render_props']['performance']['viewport'] = {}
             settings['render_props']['performance']['viewport']['preview_pixel_size'] = bpy.context.scene.render.preview_pixel_size
-
-            # Bake
+            # Render Properties - Bake
             settings['render_props']['bake'] = {}
             settings['render_props']['bake']['use_bake_multires'] = bpy.context.scene.render.use_bake_multires
             settings['render_props']['bake']['bake_type'] = bpy.context.scene.render.bake_type
@@ -195,16 +198,15 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['bake']['margin'] = {}
             settings['render_props']['bake']['margin']['bake_margin_type'] = bpy.context.scene.render.bake_margin_type
             settings['render_props']['bake']['margin']['bake_margin'] = bpy.context.scene.render.bake_margin
-
-            # Grease Pencil
+            # Render Properties - Grease Pencil
             settings['render_props']['grease_pencil'] = {}
             settings['render_props']['grease_pencil']['antialias_threshold'] = bpy.context.scene.grease_pencil_settings.antialias_threshold
-            # Freestyle
+            # Render Properties - Freestyle
             settings['render_props']['freestyle'] = {}
             settings['render_props']['freestyle']['use_freestyle'] = bpy.context.scene.render.use_freestyle
             settings['render_props']['freestyle']['line_thickness_mode'] = bpy.context.scene.render.line_thickness_mode
             settings['render_props']['freestyle']['line_thickness'] = bpy.context.scene.render.line_thickness
-            # Color Management
+            # Render Properties - Color Management
             settings['render_props']['color_management'] = {}
             settings['render_props']['color_management']['display_device'] = bpy.context.scene.display_settings.display_device
             settings['render_props']['color_management']['view_transform'] = bpy.context.scene.view_settings.view_transform
@@ -235,7 +237,10 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['workspace']['workspace']['filter_addons'] = {}
             settings['workspace']['workspace']['filter_addons']['use_filter_by_owner'] = bpy.data.workspaces["Scripting"].use_filter_by_owner
 
+            #==================
             # Output Properties
+            #==================
+            # Output Properties - Format
             settings['output_props'] = {}
             settings['output_props']['format'] = {}
             settings['output_props']['format']['resolution_x'] = bpy.context.scene.render.resolution_x
@@ -247,7 +252,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['format']['render_region'] = bpy.context.scene.render.use_border
             settings['output_props']['format']['crop_to_render_region'] = bpy.context.scene.render.use_crop_to_border
 
-            # Frame Range
+            # Output Properties - Frame Range
             settings['output_props']['frame_range'] = {}
             settings['output_props']['frame_range']['frame_start'] = bpy.context.scene.frame_start
             settings['output_props']['frame_range']['frame_end'] = bpy.context.scene.frame_end
@@ -255,7 +260,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['frame_range']['frame_map_old'] = bpy.context.scene.render.frame_map_old
             settings['output_props']['frame_range']['frame_map_new'] = bpy.context.scene.render.frame_map_new
 
-            # Stereoscopy
+            # Output Properties - Stereoscopy
             settings['output_props']['stereoscopy'] = {}
             settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.use_multiview
             settings['output_props']['stereoscopy']['views_format'] = bpy.context.scene.render.views_format
@@ -263,7 +268,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.views["right"].use
             settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.views["left"].camera_suffix
 
-            # output
+            # Output Properties - Output
             settings['output_props']['output'] = {}
             settings['output_props']['output']['filepath'] = bpy.context.scene.render.filepath
             settings['output_props']['output']['use_file_extension'] = bpy.context.scene.render.use_file_extension
@@ -297,7 +302,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['output']['color_management']['gamma'] = bpy.context.scene.view_settings.gamma
             settings['output_props']['output']['color_management']['use_curve_mapping'] = bpy.context.scene.view_settings.use_curve_mapping
             # curve info is not currently readable.
-            # Metadata
+            # Output Properties - Metadata
             settings['output_props']['metadata'] = {}
             settings['output_props']['metadata']['metadata_input'] = bpy.context.scene.render.metadata_input
             settings['output_props']['metadata']['use_stamp_date'] = bpy.context.scene.render.use_stamp_date
@@ -326,11 +331,14 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['post_processing']['use_sequencer'] = bpy.context.scene.render.use_sequencer = False
             settings['output_props']['post_processing']['dither_intensity'] = bpy.context.scene.render.dither_intensity = 0.776119
 
+            #======================
             # View Layer Properties
+            #======================
             settings['viewlayer_props'] = {}
             settings['viewlayer_props']['use'] = bpy.context.scene.view_layers["ViewLayer"].use
             settings['viewlayer_props']['use_single_layer'] = bpy.context.scene.render.use_single_layer
 
+            # View Layer Properties - Passes
             settings['viewlayer_props']['passes'] = {}
             settings['viewlayer_props']['passes']['data'] = {}
             settings['viewlayer_props']['passes']['data']['use_pass_combined'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_combined
@@ -370,6 +378,7 @@ class SaveButtonOperator(bpy.types.Operator):
             # settings['viewlayer_props']['passes']['shader_aov'] = {}
             # settings['viewlayer_props']['passes']['light_groups'] = {}
 
+            # View Layer Properties - Filter
             settings['viewlayer_props']['filter'] = {}
             settings['viewlayer_props']['filter']['use_sky'] = bpy.context.scene.view_layers["ViewLayer"].use_sky = False
             settings['viewlayer_props']['filter']['use_solid'] = bpy.context.scene.view_layers["ViewLayer"].use_solid = False
@@ -378,16 +387,19 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['viewlayer_props']['filter']['use_motion_blur'] = bpy.context.scene.view_layers["ViewLayer"].use_motion_blur = False
             # settings['viewlayer_props']['filter']['use_denoising'] = bpy.data.scenes["Scene"].(null)
 
-
+            # View Layer Properties - Override
             settings['viewlayer_props']['override'] = {}
             # settings['viewlayer_props']['override']['material_override'] = bpy.context.scene.view_layers["ViewLayer"].material_override
             settings['viewlayer_props']['override']['samples'] = bpy.context.scene.view_layers["ViewLayer"].samples
 
-            # Custom Properties - TBD - FUTURE
+            # View Layer Properties - Custom Properties - TBD - FUTURE
             settings['viewlayer_props']['custom_props'] = {}
 
+            #=================
             # Scene Properties
+            #=================
             settings['scene_props'] = {}
+            # Scene Properties - Scene
             settings['scene_props']['scene'] = {}
             # I need to figure out how to serialize the camera. Value printed is:
             # <bpy_struct, Object("Camera") at 0x000002EE7C60B908>
@@ -400,6 +412,7 @@ class SaveButtonOperator(bpy.types.Operator):
             # I suspect the following 2 lines will also fail 
             # settings['scene_props']['scene']['background_set'] = bpy.context.scene.background_set
             # settings['scene_props']['scene']['active_clip'] = bpy.context.scene.active_clip # Is this right?
+            # Scene Properties - Units
             settings['scene_props']['units'] = {}
             settings['scene_props']['units']['system'] = bpy.context.scene.unit_settings.system
             settings['scene_props']['units']['scale_length'] = bpy.context.scene.unit_settings.scale_length
@@ -409,31 +422,43 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['scene_props']['units']['mass_unit'] = bpy.context.scene.unit_settings.mass_unit
             settings['scene_props']['units']['time_unit'] = bpy.context.scene.unit_settings.time_unit
             settings['scene_props']['units']['temperature_unit'] = bpy.context.scene.unit_settings.temperature_unit
+            # Scene Properties - Gravity
             settings['scene_props']['gravity'] = {}
             settings['scene_props']['gravity']['use_gravity'] = bpy.context.scene.use_gravity
             settings['scene_props']['gravity']['gravity_x'] = bpy.context.scene.gravity[0]
             settings['scene_props']['gravity']['gravity_y'] = bpy.context.scene.gravity[1]
             settings['scene_props']['gravity']['gravity_z'] = bpy.context.scene.gravity[2]
+            # Scene Properties - Keying SSets
             settings['scene_props']['keying_sets'] = {} # TBD
+            # Scene Properties - Audio
             settings['scene_props']['audio'] = {}
             settings['scene_props']['audio']['volume'] = bpy.context.scene.audio_volume
             settings['scene_props']['audio']['audio_distance_model'] = bpy.context.scene.audio_distance_model
             settings['scene_props']['audio']['audio_doppler_speed'] = bpy.context.scene.audio_doppler_speed
             settings['scene_props']['audio']['audio_doppler_factor'] = bpy.context.scene.audio_doppler_factor
+            # Scene Properties - Rigid Body  World
             settings['scene_props']['rigid_body_world'] = {} # TBD FUTURE
+            # Scene Properties - Custom Properties
             settings['scene_props']['custom_properties'] = {} # TBD FUTURE
+
+            #=================
             # World Properties
+            #=================
             settings['world_props'] = {}
+            # World Properties - Surface
             settings['world_props']['surface'] = {}
             # TBD
             # settings['world_props']['surface']['surface'] = bpy.data.worlds["World"].node_tree.nodes["Translucent BSDF"].inputs[0].default_value
             # settings['world_props']['surface']['color'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value
             # settings['world_props']['surface']['strength'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[1].default_value
+            # World Properties - Volume
             settings['world_props']['volume'] = {}
-            settings['world_props']['mist_pass'] = {}
-            settings['world_props']['mist_pass']['start'] = bpy.context.scene.world.mist_settings.start
-            settings['world_props']['mist_pass']['depth'] = bpy.context.scene.world.mist_settings.depth
-            settings['world_props']['mist_pass']['falloff'] = bpy.context.scene.world.mist_settings.falloff
+            # TBD - Its not clear to me how to get/set this data reliably.
+
+            # settings['world_props']['mist_pass'] = {}
+            # settings['world_props']['mist_pass']['start'] = bpy.context.scene.world.mist_settings.start
+            # settings['world_props']['mist_pass']['depth'] = bpy.context.scene.world.mist_settings.depth
+            # settings['world_props']['mist_pass']['falloff'] = bpy.context.scene.world.mist_settings.falloff
             settings['world_props']['ray_visibility'] = {}
             settings['world_props']['ray_visibility']['camera'] = bpy.context.scene.world.cycles_visibility.camera
             settings['world_props']['ray_visibility']['diffuse'] = bpy.context.scene.world.cycles_visibility.diffuse
@@ -498,6 +523,7 @@ class SaveButtonOperator(bpy.types.Operator):
             # Texture Properties - Future
             settings['texture_props'] = {}
         else:
+            print("Reading EEVEE values...")
             # EEVEE settings
             # Sampling
             settings['render_props']['sampling'] = {}

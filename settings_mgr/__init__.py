@@ -37,7 +37,7 @@ bl_info = {
 #    if "file_settings" in locals():
 #        importlib.reload(file_settings)
 
-# I found this routine in DECALMchin3. Great hack for
+# I found this routine in DECALMachin3. Great for
 # fully reloading all modules in the addon!
 def reload_modules(name):
 
@@ -59,6 +59,7 @@ def reload_modules(name):
 
     from . import save_button_operator
     importlib.reload(save_button_operator)
+    print("reload_modules   called!")
 
     from . import load_button_operator
     importlib.reload(load_button_operator)

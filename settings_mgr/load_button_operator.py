@@ -104,3 +104,19 @@ class LoadButtonOperator(bpy.types.Operator):
 
     def loadEevee(self):
         self.data['render_props']['engine']
+
+    # Convert a color string from the JSON file "(1.0, 1.0, 1.0)" into a Blender color value array
+    def stringToColor(self, colorString):
+        print("colorString = " + colorString)
+        temp = colorString.strip("()")
+        print("temp  = " + temp)
+        strArray = temp.split(',')
+        print("strArray =")
+
+        color = (0,0,0)
+        color[0] = float(strArray[0])
+        color[1] = float(strArray[1])
+        color[2] = float(strArray[2])
+        print("final color")
+        print(color)
+        return color
