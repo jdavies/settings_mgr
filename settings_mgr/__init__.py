@@ -59,7 +59,7 @@ def reload_modules(name):
 
     from . import save_button_operator
     importlib.reload(save_button_operator)
-    print("reload_modules   called!")
+    print("reload_modules called!")
 
     from . import load_button_operator
     importlib.reload(load_button_operator)
@@ -248,7 +248,8 @@ _classes = [
     load_button_operator.LoadButtonOperator,
     operator_file_import.ImportSomeData,
     MyProperties,
-    settings_mgr.NPanel
+    settings_mgr.NPanel,
+    settings_mgr.SubPanel
 ]
 
 def register():

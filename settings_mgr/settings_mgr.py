@@ -5,15 +5,21 @@ from .save_button_operator import (SaveButtonOperator)
 from .load_button_operator import (LoadButtonOperator)
 from .operator_file_import import (ImportSomeData)
 
-class NPanel(bpy.types.Panel):
-    """Creates an N-Panel in the Object properties window"""
-    # Panel Text
-    bl_label = "Settings Manager"
-    bl_idname = "OBJECT_PT_random"
+class BasePanel:
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
-    # Tab name
-    bl_category = "SetMgr"
+    bl_category = "Set Mgr" # Tab name
+    bl_options = {"DEFAULT_CLOSED"}
+
+class NPanel(BasePanel, bpy.types.Panel):
+    """Creates an N-Panel in the Object properties window"""
+    # bl_space_type = 'VIEW_3D'
+    # bl_region_type = 'UI'
+    # bl_category = "SetMgr" # Tab name
+    # bl_options = {"DEFAULT_OPEN"}
+    # Panel Text
+    bl_label = "Settings Manager"
+    bl_idname = "OBJECT_PT_settings"
 
     saveFilePath = ''
 
@@ -87,6 +93,25 @@ class NPanel(bpy.types.Panel):
         row = box.row()
         row.operator(LoadButtonOperator.bl_idname, text="Load Settings", icon='LINENUMBERS_ON')
 
-    def execute(self, context):
-        save_file = self.save_file_name
-        print("save_file = " + save_file)
+    # def execute(self, context):
+    #     save_file = self.save_file_name
+    #     print("save_file = " + save_file)
+
+class SubPanel(BasePanel, bpy.types.Panel):
+    """Creates an N-Panel in the Object properties window"""
+    bl_options = {"DEFAULT_CLOSED"}
+    # Panel Text
+    bl_parent_id = "OBJECT_PT_settings" # Use the bl_idname of the parent!
+    bl_label = "Subpanel"
+    bl_idname = "OBJECT_PT_subpanel"
+
+    def draw(self, context):
+        # Do the layout
+        layout = self.layout
+        scene = context.scene
+        # obj = context.object
+        my_props = scene.my_props
+        
+        # Save file section
+        box = layout.box()
+        box.label(text = "SubPanel Settings")
