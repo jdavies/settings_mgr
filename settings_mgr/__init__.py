@@ -104,7 +104,7 @@ import sys
 import json
 from bpy.utils import register_class, unregister_class
 from random import randint
-from bpy.props import (StringProperty, PointerProperty, BoolProperty)
+from bpy.props import (StringProperty, PointerProperty, BoolProperty, FloatProperty, IntProperty)
 from bpy.types import (Panel, Operator, PropertyGroup)
 from . import settings_mgr
 from . import save_button_operator
@@ -134,114 +134,59 @@ class MyProperties(PropertyGroup):
         maxlen=1024
         )
 
-    load_pref_render_bake : BoolProperty(
-        name = "Bake",
-        description = "Load the Bake portion of the Render Properties",
+    # ================================
+    # Load Preferences - Render - Main
+    # ================================
+    
+    load_pref_workspace : BoolProperty(
+        name = "Use Workspace settings",
+        description = "Load the workspace properties",
         default = True
         )
 
-    load_pref_render_colormanagement : BoolProperty(
-        name = "Color Management",
-        description = "Load the Color Management portion of the Render Properties",
+    load_pref_render : BoolProperty(
+        name = "Use Render settings",
+        description = "Load the render properties",
         default = True
         )
 
-    load_pref_render_curves : BoolProperty(
-        name = "Curves",
-        description = "Load the Curves portion of the Render Properties",
+    load_pref_output : BoolProperty(
+        name = "Use Output settings",
+        description = "Load the output properties",
         default = True
         )
 
-    load_pref_render_film : BoolProperty(
-        name = "Film",
-        description = "Load the Film portion of the Render Properties",
+    load_pref_view_layer : BoolProperty(
+        name = "Use View Layer settings",
+        description = "Load the view  layer properties",
         default = True
         )
 
-    load_pref_render_freestyle : BoolProperty(
-        name = "Freestyle",
-        description = "Load the Freestyle portion of the Render Properties",
+    load_pref_scene : BoolProperty(
+        name = "Use Scene settings",
+        description = "Load the scene properties",
         default = True
         )
 
-    load_pref_render_greasepencil : BoolProperty(
-        name = "Grease Pencil",
-        description = "Load the Grease Pencil portion of the Render Properties",
+    load_pref_world : BoolProperty(
+        name = "Use World settings",
+        description = "Load the world properties",
+        default = True
+        )
+    
+    load_pref_collection : BoolProperty(
+        name = "Use Collection settings",
+        description = "Load the collection properties",
         default = True
         )
 
-    load_pref_render_lightpaths : BoolProperty(
-        name = "Light Paths",
-        description = "Load the Light Paths portion of the Render Properties",
+    load_pref_texture : BoolProperty(
+        name = "Use Texture settings",
+        description = "Load the texture properties",
         default = True
         )
 
-    load_pref_render_motionblur : BoolProperty(
-        name = "Motion Blur",
-        description = "Load the Motion Blue portion of the Render Properties",
-        default = True
-        )
 
-    load_pref_render_performance : BoolProperty(
-        name = "Performance",
-        description = "Load the Performance portion of the Render Properties",
-        default = True
-        )
-
-    load_pref_render_sampling : BoolProperty(
-        name = "Sampling",
-        description = "Load the Sampling portion of the Render Properties",
-        default = True
-        )
-
-    load_pref_render_simplify : BoolProperty(
-        name = "Simplify",
-        description = "Load the Simplify portion of the Render Properties",
-        default = True
-        )
-
-    load_pref_render_volumes : BoolProperty(
-        name = "Volumes",
-        description = "Load the Volumes portion of the Render Properties",
-        default = True
-        )
-
-    # Output Properties
-    load_pref_output_format : BoolProperty(
-        name = "Format",
-        description = "Load the Format portion of the Output Properties",
-        default = True
-        )
-
-    load_pref_output_frame_range : BoolProperty(
-        name = "Frame Range",
-        description = "Load the Frame Range portion of the Output Properties",
-        default = True
-        )
-
-    load_pref_output_metadata : BoolProperty(
-        name = "Metadata",
-        description = "Load the Metadata portion of the Output Properties",
-        default = True
-        )
-
-    load_pref_output_output : BoolProperty(
-        name = "Output",
-        description = "Load the Output portion of the Output Properties",
-        default = True
-        )
-
-    load_pref_output_postprocessing : BoolProperty(
-        name = "Post Processing",
-        description = "Load the Post Processing portion of the Output Properties",
-        default = True
-        )
-
-    load_pref_output_stereoscopy : BoolProperty(
-        name = "Stereoscopy",
-        description = "Load the Stereoscopy portion of the Output Properties",
-        default = True
-        )
 
 _classes = [
     save_button_operator.SaveButtonOperator,
@@ -249,7 +194,6 @@ _classes = [
     operator_file_import.ImportSomeData,
     MyProperties,
     settings_mgr.NPanel,
-    settings_mgr.SubPanel
 ]
 
 def register():
