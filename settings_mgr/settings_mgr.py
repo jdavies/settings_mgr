@@ -43,53 +43,25 @@ class NPanel(BasePanel, bpy.types.Panel):
         # Load File
         box = layout.box()
         box.label(text = "Load Settings")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_workspace")
+        row.prop(my_props, "load_pref_render")
+        row = box.row()
+        row.prop(my_props, "load_pref_output")
+        row.prop(my_props, "load_pref_view_layer")
+        row = box.row()
+        row.prop(my_props, "load_pref_scene")
+        row.prop(my_props, "load_pref_world")
+        row = box.row()
+        row.prop(my_props, "load_pref_collection")
+        row.prop(my_props, "load_pref_texture")
+
         row = box.row()
         row.prop(my_props, "load_filename")
         loadFileOp = row.operator(ImportSomeData.bl_idname, text="", icon='FILEBROWSER')
         loadFileOp.isSaveFile = False   # False = We are loading data
-        row = box.row()
-        box.label(text = "Render Properties")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_render_bake")
-        row.prop(my_props, "load_pref_render_colormanagement")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_render_curves")
-        row.prop(my_props, "load_pref_render_film")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_render_freestyle")
-        row.prop(my_props, "load_pref_render_greasepencil")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_render_lightpaths")
-        row.prop(my_props, "load_pref_render_motionblur")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_render_performance")
-        row.prop(my_props, "load_pref_render_sampling")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_render_simplify")
-        row.prop(my_props, "load_pref_render_volumes")
-
-
-        # Output Props
-        row = box.row()
-        box.label(text = "Output Properties")
-        row = box.row()
-        row.prop(my_props, "load_pref_output_format")
-        row.prop(my_props, "load_pref_output_frame_range")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_output_metadata")
-        row.prop(my_props, "load_pref_output_output")
-
-        row = box.row()
-        row.prop(my_props, "load_pref_output_postprocessing")
-        row.prop(my_props, "load_pref_output_stereoscopy")
-
+        
         row = box.row()
         row.operator(LoadButtonOperator.bl_idname, text="Load Settings", icon='LINENUMBERS_ON')
 
@@ -97,13 +69,13 @@ class NPanel(BasePanel, bpy.types.Panel):
     #     save_file = self.save_file_name
     #     print("save_file = " + save_file)
 
-class SubPanel(BasePanel, bpy.types.Panel):
-    """Creates an N-Panel in the Object properties window"""
+class RenderPropsSubPanel(BasePanel, bpy.types.Panel):
+    """Creates a child N-Panel in the Object properties window"""
     bl_options = {"DEFAULT_CLOSED"}
     # Panel Text
     bl_parent_id = "OBJECT_PT_settings" # Use the bl_idname of the parent!
-    bl_label = "Subpanel"
-    bl_idname = "OBJECT_PT_subpanel"
+    bl_label = "Render Properties"
+    bl_idname = "OBJECT_PT_renderprops"
 
     def draw(self, context):
         # Do the layout
@@ -112,6 +84,14 @@ class SubPanel(BasePanel, bpy.types.Panel):
         # obj = context.object
         my_props = scene.my_props
         
-        # Save file section
+        # Render Props section
         box = layout.box()
-        box.label(text = "SubPanel Settings")
+
+        row = box.row()
+        row.prop(my_props, "load_pref_render")
+        row.prop(my_props, "load_pref_output")
+        row.prop(my_props, "load_pref_view_layer")
+        row.prop(my_props, "load_pref_scene")
+        row.prop(my_props, "load_pref_world")
+        row.prop(my_props, "load_pref_collection")
+        row.prop(my_props, "load_pref_texture")
