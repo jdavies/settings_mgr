@@ -2,6 +2,6 @@ settings_mgr_test.blend1
 test/test.json
 *.zip
 *.json
-sim_test.blend1
-sim_test.blend
-sim0001-0250.mp4
+*.blend1
+*.blend
+*.mp4
