@@ -57,6 +57,8 @@ class SaveButtonOperator(bpy.types.Operator):
 
     def readSettings(self, context, settings):
         print('Reading the settings...')
+        # Add a file version to help protect against future changes to the file format
+        settings['file_version'] = 1.0
 
         # Are we using cycles or EEVEE?
         settings['render_props'] = {}
@@ -530,6 +532,25 @@ class SaveButtonOperator(bpy.types.Operator):
         else:
             print("Reading EEVEE values...")
             # EEVEE settings
+            # ==================
+            # Workspace Settings
+            # ==================
+            settings['workspace'] = {}
+            settings['workspace']['options'] = {}
+            settings['workspace']['options']['transform'] = {}
+            settings['workspace']['options']['transform']['use_transform_data_origin'] = bpy.context.scene.tool_settings.use_transform_data_origin
+            settings['workspace']['options']['transform']['use_transform_pivot_point_align'] = bpy.context.scene.tool_settings.use_transform_pivot_point_align
+            settings['workspace']['options']['transform']['use_transform_skip_children'] = bpy.context.scene.tool_settings.use_transform_skip_children
+
+            settings['workspace']['workspace'] = {}
+            settings['workspace']['workspace']['use_pin_scene'] = bpy.data.workspaces["Scripting"].use_pin_scene
+            settings['workspace']['workspace']['object_mode'] = bpy.data.workspaces["Scripting"].object_mode
+            settings['workspace']['workspace']['filter_addons'] = {}
+            settings['workspace']['workspace']['filter_addons']['use_filter_by_owner'] = bpy.data.workspaces["Scripting"].use_filter_by_owner
+
+            # ===============
+            # Render Settings
+            # ===============
             # Sampling
             settings['render_props']['sampling'] = {}
             settings['render_props']['sampling']['render_samples'] = bpy.context.scene.eevee.taa_render_samples
@@ -551,6 +572,318 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['sampling']['bloom']['bloom_color'] = self.colorToString(bpy.context.scene.eevee.bloom_color)
             settings['render_props']['sampling']['bloom']['bloom_intensity'] = bpy.context.scene.eevee.bloom_intensity
             settings['render_props']['sampling']['bloom']['bloom_clamp'] = bpy.context.scene.eevee.bloom_clamp
+            # Depth of Field
+            settings['render_props']['sampling']['depth_of_field'] = {}
+            settings['render_props']['sampling']['depth_of_field']['bokeh_max_size'] = bpy.context.scene.eevee.bokeh_max_size
+            settings['render_props']['sampling']['depth_of_field']['bokeh_threshold'] = bpy.context.scene.eevee.bokeh_threshold
+            settings['render_props']['sampling']['depth_of_field']['bokeh_neighbor_max'] = bpy.context.scene.eevee.bokeh_neighbor_max
+            settings['render_props']['sampling']['depth_of_field']['bokeh_denoise_fac'] = bpy.context.scene.eevee.bokeh_denoise_fac
+            settings['render_props']['sampling']['depth_of_field']['use_bokeh_high_quality_slight_defocus'] = bpy.context.scene.eevee.use_bokeh_high_quality_slight_defocus
+            settings['render_props']['sampling']['depth_of_field']['use_bokeh_jittered'] = bpy.context.scene.eevee.use_bokeh_jittered
+            settings['render_props']['sampling']['depth_of_field']['bokeh_overblur'] = bpy.context.scene.eevee.bokeh_overblur
+            # Subsurface Scattering
+            settings['render_props']['sampling']['subsurface_scattering'] = {}
+            settings['render_props']['sampling']['subsurface_scattering']['sss_samples'] = bpy.context.scene.eevee.sss_samples
+            settings['render_props']['sampling']['subsurface_scattering']['sss_jitter_threshold'] = bpy.context.scene.eevee.sss_jitter_threshold
+            # Screen Space Reflections
+            settings['render_props']['sampling']['screen_space_reflections'] = {}
+            settings['render_props']['sampling']['screen_space_reflections']['use_ssr'] = bpy.context.scene.eevee.use_ssr
+            settings['render_props']['sampling']['screen_space_reflections']['use_ssr_refraction'] = bpy.context.scene.eevee.use_ssr_refraction
+            settings['render_props']['sampling']['screen_space_reflections']['use_ssr_halfres'] = bpy.context.scene.eevee.use_ssr_halfres
+            settings['render_props']['sampling']['screen_space_reflections']['ssr_quality'] = bpy.context.scene.eevee.ssr_quality
+            settings['render_props']['sampling']['screen_space_reflections']['ssr_max_roughness'] = bpy.context.scene.eevee.ssr_max_roughness
+            settings['render_props']['sampling']['screen_space_reflections']['ssr_thickness'] = bpy.context.scene.eevee.ssr_thickness
+            settings['render_props']['sampling']['screen_space_reflections']['ssr_border_fade'] = bpy.context.scene.eevee.ssr_border_fade
+            settings['render_props']['sampling']['screen_space_reflections']['ssr_firefly_fac'] = bpy.context.scene.eevee.ssr_firefly_fac
+            # Motion Blur
+            settings['render_props']['motion_blur'] = {}
+            settings['render_props']['motion_blur']['motion_blur_position'] = bpy.context.scene.eevee.motion_blur_position
+            settings['render_props']['motion_blur']['motion_blur_shutter'] = bpy.context.scene.eevee.motion_blur_shutter
+            settings['render_props']['motion_blur']['motion_blur_depth_scale'] = bpy.context.scene.eevee.motion_blur_depth_scale
+            settings['render_props']['motion_blur']['motion_blur_max'] = bpy.context.scene.eevee.motion_blur_max
+            settings['render_props']['motion_blur']['motion_blur_steps'] = bpy.context.scene.eevee.motion_blur_steps
+            # Volumetrics
+            settings['render_props']['volumetrics'] = {}
+            settings['render_props']['volumetrics']['volumetric_start'] = bpy.context.scene.eevee.volumetric_start
+            settings['render_props']['volumetrics']['volumetric_end'] = bpy.context.scene.eevee.volumetric_end
+            settings['render_props']['volumetrics']['volumetric_tile_size'] = bpy.context.scene.eevee.volumetric_tile_size
+            settings['render_props']['volumetrics']['volumetric_samples'] = bpy.context.scene.eevee.volumetric_samples
+            settings['render_props']['volumetrics']['volumetric_sample_distribution'] = bpy.context.scene.eevee.volumetric_sample_distribution
+            settings['render_props']['volumetrics']['use_volumetric_lights'] = bpy.context.scene.eevee.use_volumetric_lights
+            settings['render_props']['volumetrics']['use_volumetric_lights'] = bpy.context.scene.eevee.use_volumetric_lights
+            settings['render_props']['volumetrics']['volumetric_light_clamp'] = bpy.context.scene.eevee.volumetric_light_clamp
+            settings['render_props']['volumetrics']['use_volumetric_shadows'] = bpy.context.scene.eevee.use_volumetric_shadows
+            settings['render_props']['volumetrics']['volumetric_shadow_samples'] = bpy.context.scene.eevee.volumetric_shadow_samples
+            # Performnce
+            settings['render_props']['performance'] = {}
+            settings['render_props']['performance']['use_high_quality_normals'] = bpy.context.scene.render.use_high_quality_normals
+            # Curves
+            settings['render_props']['curves'] = {}
+            settings['render_props']['curves']['hair_type'] = bpy.context.scene.render.hair_type
+            settings['render_props']['curves']['hair_subdiv'] = bpy.context.scene.render.hair_subdiv
+            # Shadows
+            settings['render_props']['shadows'] = {}
+            settings['render_props']['shadows']['shadow_cube_size'] = bpy.context.scene.eevee.shadow_cube_size
+            settings['render_props']['shadows']['shadow_cascade_size'] = bpy.context.scene.eevee.shadow_cascade_size
+            settings['render_props']['shadows']['use_shadow_high_bitdepth'] = bpy.context.scene.eevee.use_shadow_high_bitdepth
+            settings['render_props']['shadows']['use_soft_shadows'] = bpy.context.scene.eevee.use_soft_shadows
+            settings['render_props']['shadows']['light_threshold'] = bpy.context.scene.eevee.light_threshold
+            # Indirect Lighting
+            settings['render_props']['indirect_lighting'] = {}
+            settings['render_props']['indirect_lighting']['gi_auto_bake'] = bpy.context.scene.eevee.gi_auto_bake
+            settings['render_props']['indirect_lighting']['gi_diffuse_bounces'] = bpy.context.scene.eevee.gi_diffuse_bounces
+            settings['render_props']['indirect_lighting']['gi_cubemap_resolution'] = bpy.context.scene.eevee.gi_cubemap_resolution
+            settings['render_props']['indirect_lighting']['gi_visibility_resolution'] = bpy.context.scene.eevee.gi_visibility_resolution
+            settings['render_props']['indirect_lighting']['gi_irradiance_smoothing'] = bpy.context.scene.eevee.gi_irradiance_smoothing
+            settings['render_props']['indirect_lighting']['gi_glossy_clamp'] = bpy.context.scene.eevee.gi_glossy_clamp
+            settings['render_props']['indirect_lighting']['gi_filter_quality'] = bpy.context.scene.eevee.gi_filter_quality
+            settings['render_props']['indirect_lighting']['gi_cubemap_display_size'] = bpy.context.scene.eevee.gi_cubemap_display_size
+            settings['render_props']['indirect_lighting']['gi_irradiance_display_size'] = bpy.context.scene.eevee.gi_irradiance_display_size
+            # Film
+            settings['render_props']['film'] = {}
+            settings['render_props']['film']['filter_size'] = bpy.context.scene.render.filter_size
+            settings['render_props']['film']['film_transparent'] = bpy.context.scene.render.film_transparent
+            settings['render_props']['film']['overscan_size'] = bpy.context.scene.eevee.overscan_size
+            settings['render_props']['film']['use_overscan'] = bpy.context.scene.eevee.use_overscan
+            # Simplify
+            settings['render_props']['simplify'] = {}
+            settings['render_props']['simplify']['use_simplify'] = bpy.context.scene.render.use_simplify
+            settings['render_props']['simplify']['simplify_subdivision'] = bpy.context.scene.render.simplify_subdivision
+            settings['render_props']['simplify']['simplify_child_particles'] = bpy.context.scene.render.simplify_child_particles
+            settings['render_props']['simplify']['simplify_volumes'] = bpy.context.scene.render.simplify_volumes
+            settings['render_props']['simplify']['simplify_subdivision_render'] = bpy.context.scene.render.simplify_subdivision_render
+            settings['render_props']['simplify']['simplify_child_particles_render'] = bpy.context.scene.render.simplify_child_particles_render
+            settings['render_props']['simplify']['simplify_gpencil'] = bpy.context.scene.render.simplify_gpencil
+            settings['render_props']['simplify']['simplify_gpencil_onplay'] = bpy.context.scene.render.simplify_gpencil_onplay
+            settings['render_props']['simplify']['simplify_gpencil_view_fill'] = bpy.context.scene.render.simplify_gpencil_view_fill
+            settings['render_props']['simplify']['simplify_gpencil_modifier'] = bpy.context.scene.render.simplify_gpencil_modifier
+            settings['render_props']['simplify']['simplify_gpencil_shader_fx'] = bpy.context.scene.render.simplify_gpencil_shader_fx
+            settings['render_props']['simplify']['simplify_gpencil_tint'] = bpy.context.scene.render.simplify_gpencil_tint
+            settings['render_props']['simplify']['simplify_gpencil_antialiasing'] = bpy.context.scene.render.simplify_gpencil_antialiasing
+            # Grease Pencil
+            settings['render_props']['grease_pencil'] = {}
+            settings['render_props']['grease_pencil']['antialias_threshold'] = bpy.context.scene.grease_pencil_settings.antialias_threshold
+            # Freestyle
+            settings['render_props']['freestyle'] = {}
+            settings['render_props']['freestyle']['use_freestyle'] = bpy.context.scene.render.use_freestyle
+            settings['render_props']['freestyle']['line_thickness_mode'] = bpy.context.scene.render.line_thickness_mode
+            settings['render_props']['freestyle']['line_thickness'] = bpy.context.scene.render.line_thickness
+            # Color Management
+            settings['render_props']['color_management']['display_device'] = bpy.context.scene.display_settings.display_device
+            settings['render_props']['color_management']['view_transform'] = bpy.context.scene.view_settings.view_transform
+            settings['render_props']['color_management']['look'] = bpy.context.scene.view_settings.look
+            settings['render_props']['color_management']['exposure'] = bpy.context.scene.view_settings.exposure
+            settings['render_props']['color_management']['gamma'] = bpy.context.scene.view_settings.gamma
+            settings['render_props']['color_management']['name'] = bpy.context.scene.sequencer_colorspace_settings.name
+            settings['render_props']['color_management']['use_curve_mapping'] = bpy.context.scene.view_settings.use_curve_mapping
+
+            # ===============
+            # Output Settings
+            # ===============
+            # Format
+            settings['output_props']= {}
+            settings['output_props']['format'] = {}
+            settings['output_props']['format']['resolution_x'] = bpy.context.scene.render.resolution_x
+            settings['output_props']['format']['resolution_y'] = bpy.context.scene.render.resolution_y
+            settings['output_props']['format']['resolution_percentage'] = bpy.context.scene.render.resolution_percentage
+            settings['output_props']['format']['pixel_aspect_x'] = bpy.context.scene.render.pixel_aspect_x
+            settings['output_props']['format']['pixel_aspect_y'] = bpy.context.scene.render.pixel_aspect_y
+            settings['output_props']['format']['use_border'] = bpy.context.scene.render.use_border
+            settings['output_props']['format']['use_crop_to_border'] = bpy.context.scene.render.use_crop_to_border
+            # Frame Range
+            settings['output_props']['frame_range'] = {}
+            settings['output_props']['frame_range']['frame_start'] = bpy.context.scene.frame_start
+            settings['output_props']['frame_range']['frame_end'] = bpy.context.scene.frame_end
+            settings['output_props']['frame_range']['frame_step'] = bpy.context.scene.frame_step
+            settings['output_props']['frame_range']['frame_map_old'] = bpy.context.scene.render.frame_map_old
+            settings['output_props']['frame_range']['frame_map_new'] = bpy.context.scene.render.frame_map_new
+            # Stereoscopy
+            settings['output_props']['stereoscopy'] = {}
+            settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.use_multiview
+            settings['output_props']['stereoscopy']['views_format'] = bpy.context.scene.render.views_format
+            settings['output_props']['stereoscopy']['left_use'] = bpy.context.scene.render.views["left"].use
+            settings['output_props']['stereoscopy']['right_use'] = bpy.context.scene.render.views["right"].use
+            settings['output_props']['stereoscopy']['left_camera_suffix'] = bpy.context.scene.render.views["left"].camera_suffix
+            settings['output_props']['stereoscopy']['right_camera_suffix'] = bpy.context.scene.render.views["right"].camera_suffix
+            # Output
+            settings['output_props']['output'] = {}
+            settings['output_props']['output']['filepath'] = bpy.context.scene.render.filepath
+            settings['output_props']['output']['use_file_extension'] = bpy.context.scene.render.use_file_extension
+            settings['output_props']['output']['use_render_cache'] = bpy.context.scene.render.use_render_cache
+            settings['output_props']['output']['file_format'] = bpy.context.scene.render.image_settings.file_format
+            settings['output_props']['output']['color_mode'] = bpy.context.scene.render.image_settings.color_mode
+            settings['output_props']['output']['use_placeholder'] = bpy.context.scene.render.use_placeholder
+            settings['output_props']['output']['views_format'] = bpy.context.scene.render.image_settings.views_format
+            # TODO
+            # settings['output_props']['output']['stereo_mode'] = bpy.data.scenes["Scene"].(null) = 'INTERLACE'
+            settings['output_props']['output']['color_management'] = bpy.context.scene.render.image_settings.color_management
+            settings['output_props']['output']['name'] = bpy.context.scene.colorspace_settings.name
+            # Metadata
+            settings['output_props']['metadata'] = {}
+            settings['output_props']['metadata']['metadata_input'] = bpy.context.scene.render.metadata_input
+            settings['output_props']['metadata']['use_stamp_date'] = bpy.context.scene.render.use_stamp_date
+            settings['output_props']['metadata']['use_stamp_time'] = bpy.context.scene.render.use_stamp_time
+            settings['output_props']['metadata']['use_stamp_render_time'] = bpy.context.scene.render.use_stamp_render_time
+            settings['output_props']['metadata']['use_stamp_frame'] = bpy.context.scene.render.use_stamp_frame
+            settings['output_props']['metadata']['use_stamp_frame_range'] = bpy.context.scene.render.use_stamp_frame_range
+            settings['output_props']['metadata']['use_stamp_memory'] = bpy.context.scene.render.use_stamp_memory
+            settings['output_props']['metadata']['use_stamp_hostname'] = bpy.context.scene.render.use_stamp_hostname
+            settings['output_props']['metadata']['use_stamp_camera'] = bpy.context.scene.render.use_stamp_camera
+            settings['output_props']['metadata']['use_stamp_lens'] = bpy.context.scene.render.use_stamp_lens
+            settings['output_props']['metadata']['use_stamp_scene'] = bpy.context.scene.render.use_stamp_scene
+            settings['output_props']['metadata']['use_stamp_marker'] = bpy.context.scene.render.use_stamp_marker
+            settings['output_props']['metadata']['use_stamp_filename'] = bpy.context.scene.render.use_stamp_filename
+            settings['output_props']['metadata']['use_stamp_sequencer_strip'] = bpy.context.scene.render.use_stamp_sequencer_strip
+            settings['output_props']['metadata']['use_stamp_note'] = bpy.context.scene.render.use_stamp_note
+            settings['output_props']['metadata']['stamp_note_text'] = bpy.context.scene.render.stamp_note_text
+            settings['output_props']['metadata']['use_stamp'] = bpy.context.scene.render.use_stamp
+            if bpy.context.scene.render.use_stamp == True:
+                settings['output_props']['metadata']['stamp_font_size'] = bpy.context.scene.render.stamp_font_size
+                settings['output_props']['metadata']['stamp_foreground'] = self.colorToString(bpy.context.scene.render.stamp_foreground)
+                settings['output_props']['metadata']['stamp_background'] = self.colorToString(bpy.context.scene.render.stamp_background)
+                settings['output_props']['metadata']['use_stamp_labels'] = bpy.context.scene.render.use_stamp_labels
+            # Post Processing
+            settings['output_props']['post_processing'] = {}
+            settings['output_props']['post_processing']['use_compositing'] = bpy.context.scene.render.use_compositing
+            settings['output_props']['post_processing']['use_sequencer'] = bpy.context.scene.render.use_sequencer
+            settings['output_props']['post_processing']['dither_intensity'] = bpy.context.scene.render.dither_intensity
+
+            # ===================
+            # View Layer Settings
+            # ===================
+            settings['viewlayer_props'] = {}
+            settings['viewlayer_props']['view_layer'] = {}
+            settings['viewlayer_props']['view_layer']['use'] = bpy.context.scene.view_layers["ViewLayer"].use
+            settings['viewlayer_props']['view_layer']['use_single_layer'] = bpy.context.scene.render.use_single_layer
+
+            # ======
+            # Passes
+            # ======
+            settings['viewlayer_props']['passes'] = {}
+            settings['viewlayer_props']['passes']['data'] = {}
+            settings['viewlayer_props']['passes']['data']['use_pass_combined'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_combined
+            settings['viewlayer_props']['passes']['data']['use_pass_z'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_z
+            settings['viewlayer_props']['passes']['data']['use_pass_mist'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_mist
+            settings['viewlayer_props']['passes']['data']['use_pass_normal'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_normal
+            settings['viewlayer_props']['passes']['light'] = {}
+            settings['viewlayer_props']['passes']['light']['use_pass_diffuse_direct'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_diffuse_direct
+            settings['viewlayer_props']['passes']['light']['use_pass_diffuse_color'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_diffuse_color
+            settings['viewlayer_props']['passes']['light']['use_pass_glossy_direct'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_glossy_direct
+            settings['viewlayer_props']['passes']['light']['use_pass_glossy_color'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_glossy_color
+            settings['viewlayer_props']['passes']['light']['volume'] = bpy.context.scene.view_layers["ViewLayer"].eevee.use_pass_volume_direct
+            settings['viewlayer_props']['passes']['light']['use_pass_emit'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_emit
+            settings['viewlayer_props']['passes']['light']['use_pass_environment'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_environment
+            settings['viewlayer_props']['passes']['light']['use_pass_shadow'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_shadow
+            settings['viewlayer_props']['passes']['light']['use_pass_ambient_occlusion'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_ambient_occlusion
+            settings['viewlayer_props']['passes']['effects'] = {}
+            settings['viewlayer_props']['passes']['effects']['use_pass_bloom'] = bpy.context.scene.view_layers["ViewLayer"].eevee.use_pass_bloom
+            # settings['passes']['light']['use_shadow_catcher'] = bpy.data.scenes["Scene"].(null)
+            settings['viewlayer_props']['passes']['cryptomatte'] = {}
+            settings['viewlayer_props']['passes']['cryptomatte']['use_pass_cryptomatte_object'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_cryptomatte_object
+            settings['viewlayer_props']['passes']['cryptomatte']['use_pass_cryptomatte_material'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_cryptomatte_material
+            settings['viewlayer_props']['passes']['cryptomatte']['use_pass_cryptomatte_asset'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_cryptomatte_asset
+            settings['viewlayer_props']['passes']['cryptomatte']['pass_cryptomatte_depth'] = bpy.context.scene.view_layers["ViewLayer"].pass_cryptomatte_depth
+            settings['viewlayer_props']['passes']['cryptomatte']['use_pass_cryptomatte_accurate'] = bpy.context.scene.view_layers["ViewLayer"].use_pass_cryptomatte_accurate
+
+            settings['viewlayer_props']['passes']['freestyle'] = {}
+            settings['viewlayer_props']['passes']['freestyle']['use_freestyle'] = bpy.context.scene.view_layers["ViewLayer"].use_freestyle
+            # TODO - The rest of the Freestyle section I don't understand
+
+            # ===================
+            # Scene Properties
+            # ===================
+            settings['scene_props'] = {}
+            # Scene Properties - Scene
+            settings['scene_props']['scene'] = {}
+            # I need to figure out how to serialize the camera. Value printed is:
+            # <bpy_struct, Object("Camera") at 0x000002EE7C60B908>
+            # settings['scene_props']['scene']['camera'] = bpy.context.scene.camera
+            # print('scene_props.scene.camera = ')
+            # print(bpy.context.scene.camera)
+            # print('*****************************')
+            # print('*****************************')
+            # print('*****************************')
+            # I suspect the following 2 lines will also fail 
+            # settings['scene_props']['scene']['background_set'] = bpy.context.scene.background_set
+            # settings['scene_props']['scene']['active_clip'] = bpy.context.scene.active_clip # Is this right?
+            # Scene Properties - Units
+            settings['scene_props']['units'] = {}
+            settings['scene_props']['units']['system'] = bpy.context.scene.unit_settings.system
+            settings['scene_props']['units']['scale_length'] = bpy.context.scene.unit_settings.scale_length
+            settings['scene_props']['units']['use_separate'] = bpy.context.scene.unit_settings.use_separate
+            settings['scene_props']['units']['system_rotation'] = bpy.context.scene.unit_settings.system_rotation
+            settings['scene_props']['units']['length_unit'] = bpy.context.scene.unit_settings.length_unit
+            settings['scene_props']['units']['mass_unit'] = bpy.context.scene.unit_settings.mass_unit
+            settings['scene_props']['units']['time_unit'] = bpy.context.scene.unit_settings.time_unit
+            settings['scene_props']['units']['temperature_unit'] = bpy.context.scene.unit_settings.temperature_unit
+            # Scene Properties - Gravity
+            settings['scene_props']['gravity'] = {}
+            settings['scene_props']['gravity']['use_gravity'] = bpy.context.scene.use_gravity
+            settings['scene_props']['gravity']['gravity_x'] = bpy.context.scene.gravity[0]
+            settings['scene_props']['gravity']['gravity_y'] = bpy.context.scene.gravity[1]
+            settings['scene_props']['gravity']['gravity_z'] = bpy.context.scene.gravity[2]
+            # Scene Properties - Keying SSets
+            settings['scene_props']['keying_sets'] = {} # TBD
+            # Scene Properties - Audio
+            settings['scene_props']['audio'] = {}
+            settings['scene_props']['audio']['volume'] = bpy.context.scene.audio_volume
+            settings['scene_props']['audio']['audio_distance_model'] = bpy.context.scene.audio_distance_model
+            settings['scene_props']['audio']['audio_doppler_speed'] = bpy.context.scene.audio_doppler_speed
+            settings['scene_props']['audio']['audio_doppler_factor'] = bpy.context.scene.audio_doppler_factor
+            # Scene Properties - Rigid Body  World
+            settings['scene_props']['rigid_body_world'] = {} # TBD FUTURE
+            # Scene Properties - Custom Properties
+            settings['scene_props']['custom_properties'] = {} # TBD FUTURE
+
+            #=================
+            # World Properties
+            #=================
+            settings['world_props'] = {}
+            # World Properties - Surface
+            settings['world_props']['surface'] = {}
+            # TBD
+            # settings['world_props']['surface']['surface'] = bpy.data.worlds["World"].node_tree.nodes["Translucent BSDF"].inputs[0].default_value
+            # settings['world_props']['surface']['color'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value
+            # settings['world_props']['surface']['strength'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[1].default_value
+            # World Properties - Volume
+            settings['world_props']['volume'] = {}
+            # TBD - Its not clear to me how to get/set this data reliably.
+
+            settings['world_props']['mist_pass'] = {}
+            settings['world_props']['mist_pass']['start'] = bpy.context.scene.world.mist_settings.start
+            settings['world_props']['mist_pass']['depth'] = bpy.context.scene.world.mist_settings.depth
+            settings['world_props']['mist_pass']['falloff'] = bpy.context.scene.world.mist_settings.falloff
+            settings['world_props']['viewport_display'] = {}
+            settings['world_props']['viewport_display']['color'] = self.colorToString(bpy.context.scene.world.color)
+            settings['world_props']['custom_properties'] = {} # TBD FUTURE
+
+            # Collection Properties
+            settings['collection_props'] = {}
+            settings['collection_props']['restrictions'] = {}
+            settings['collection_props']['restrictions']['hide_select'] = bpy.data.collections["Collection"].hide_select
+            settings['collection_props']['restrictions']['hide_render'] = bpy.data.collections["Collection"].hide_render
+            # settings['collection_props']['restrictions']['holdout'] = bpy.data.scenes["Scene"].(null)
+            # settings['collection_props']['restrictions']['indirect_only'] = bpy.data.scenes["Scene"].(null)
+            settings['collection_props']['instancing'] = {}
+            settings['collection_props']['instancing']['instance_offset_x'] = bpy.data.collections["Collection"].instance_offset[0]
+            settings['collection_props']['instancing']['instance_offset_y'] = bpy.data.collections["Collection"].instance_offset[1]
+            settings['collection_props']['instancing']['instance_offset_z'] = bpy.data.collections["Collection"].instance_offset[2]
+            settings['collection_props']['line_art'] = {}
+            settings['collection_props']['line_art']['lineart_usage'] = bpy.data.collections["Collection"].lineart_usage
+            settings['collection_props']['line_art']['lineart_use_intersection_mask'] = bpy.data.collections["Collection"].lineart_use_intersection_mask
+            # if the use_lineart_intersection_masks is checked, then these are valid
+            settings['collection_props']['line_art']['lineart_intersection_mask_0'] = bpy.data.collections["Collection"].lineart_intersection_mask[0]
+            settings['collection_props']['line_art']['lineart_intersection_mask_1'] = bpy.data.collections["Collection"].lineart_intersection_mask[1]
+            settings['collection_props']['line_art']['lineart_intersection_mask_2'] = bpy.data.collections["Collection"].lineart_intersection_mask[2]
+            settings['collection_props']['line_art']['lineart_intersection_mask_3'] = bpy.data.collections["Collection"].lineart_intersection_mask[3]
+            settings['collection_props']['line_art']['lineart_intersection_mask_4'] = bpy.data.collections["Collection"].lineart_intersection_mask[4]
+            settings['collection_props']['line_art']['lineart_intersection_mask_5'] = bpy.data.collections["Collection"].lineart_intersection_mask[5]
+            settings['collection_props']['line_art']['lineart_intersection_mask_6'] = bpy.data.collections["Collection"].lineart_intersection_mask[6]
+            settings['collection_props']['line_art']['lineart_intersection_mask_7'] = bpy.data.collections["Collection"].lineart_intersection_mask[7]
+            settings['collection_props']['line_art']['use_lineart_intersection_priority'] = bpy.data.collections["Collection"].use_lineart_intersection_priority
+            settings['collection_props']['line_art']['lineart_intersection_priority'] = bpy.data.collections["Collection"].lineart_intersection_priority
+
+            settings['collection_props']['custom_properties'] = {}  # TODO
         # print(settings)
         print('   Done!')
 
