@@ -52,7 +52,7 @@ def cleanupFileName(origFileName):
 class ImportSomeData(Operator, ImportHelper):
     """This appears in the tooltip of the operator and in the generated docs"""
     bl_idname = "import_test.some_data"  # important since its how bpy.ops.import_test.some_data is constructed
-    bl_label = "Import Some Data"
+    bl_label = "Open"
 
     # ImportHelper mixin class uses this
     filename_ext = ".json"
@@ -78,15 +78,15 @@ class ImportSomeData(Operator, ImportHelper):
         default=True,
     )
 
-    type: EnumProperty(
-        name="Example Enum",
-        description="Choose between two items",
-        items=(
-            ('OPT_A', "First Option", "Description one"),
-            ('OPT_B', "Second Option", "Description two"),
-        ),
-        default='OPT_A',
-    )
+    # type: EnumProperty(
+    #     name="Example Enum",
+    #     description="Choose between two items",
+    #     items=(
+    #         ('OPT_A', "First Option", "Description one"),
+    #         ('OPT_B', "Second Option", "Description two"),
+    #     ),
+    #     default='OPT_A',
+    # )
 
     def execute(self, context):
         return self.read_some_data(context, self.filepath, self.use_setting)

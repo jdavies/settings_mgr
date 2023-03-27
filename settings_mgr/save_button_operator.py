@@ -155,13 +155,14 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['simplify']['grease_pencil']['simplify_gpencil_shader_fx'] = bpy.context.scene.render.simplify_gpencil_shader_fx
             settings['render_props']['simplify']['grease_pencil']['simplify_gpencil_tint'] = bpy.context.scene.render.simplify_gpencil_tint
             settings['render_props']['simplify']['grease_pencil']['simplify_gpencil_antialiasing'] = bpy.context.scene.render.simplify_gpencil_antialiasing
+
             # Render Properties - Motion Blur
             settings['render_props']['motion_blur'] = {}
-            settings['render_props']['motion_blur']['use_motion_blur'] = bpy.context.scene.render.use_motion_blur = True
-            settings['render_props']['motion_blur']['motion_blur_position'] = bpy.context.scene.cycles.motion_blur_position = 'CENTER'
-            settings['render_props']['motion_blur']['motion_blur_shutter'] = bpy.context.scene.render.motion_blur_shutter = 0.6
-            settings['render_props']['motion_blur']['rolling_shutter_type'] = bpy.context.scene.cycles.rolling_shutter_type = 'TOP'
-            settings['render_props']['motion_blur']['rolling_shutter_duration'] = bpy.context.scene.cycles.rolling_shutter_duration = 0.2
+            settings['render_props']['motion_blur']['use_motion_blur'] = bpy.context.scene.render.use_motion_blur
+            settings['render_props']['motion_blur']['motion_blur_position'] = bpy.context.scene.cycles.motion_blur_position
+            settings['render_props']['motion_blur']['motion_blur_shutter'] = bpy.context.scene.render.motion_blur_shutter
+            settings['render_props']['motion_blur']['rolling_shutter_type'] = bpy.context.scene.cycles.rolling_shutter_type
+            settings['render_props']['motion_blur']['rolling_shutter_duration'] = bpy.context.scene.cycles.rolling_shutter_duration
             settings['render_props']['motion_blur']['shutter_curve'] = {} # not available ATM
 
             # Render Properties - Film
@@ -188,6 +189,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['performance']['final_render']['use_persistent_data'] = bpy.context.scene.render.use_persistent_data
             settings['render_props']['performance']['viewport'] = {}
             settings['render_props']['performance']['viewport']['preview_pixel_size'] = bpy.context.scene.render.preview_pixel_size
+
             # Render Properties - Bake
             settings['render_props']['bake'] = {}
             settings['render_props']['bake']['use_bake_multires'] = bpy.context.scene.render.use_bake_multires
@@ -197,7 +199,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['bake']['output']['use_bake_lores_mesh'] = bpy.context.scene.render.use_bake_lores_mesh
             settings['render_props']['bake']['margin'] = {}
             settings['render_props']['bake']['margin']['bake_margin_type'] = bpy.context.scene.render.bake_margin_type
-            settings['render_props']['bake']['margin']['bake_margin'] = bpy.context.scene.render.bake_margin
+            settings['render_props']['bake']['margin']['bake_margin_size'] = bpy.context.scene.render.bake_margin
             # Render Properties - Grease Pencil
             settings['render_props']['grease_pencil'] = {}
             settings['render_props']['grease_pencil']['antialias_threshold'] = bpy.context.scene.grease_pencil_settings.antialias_threshold
@@ -264,9 +266,10 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['stereoscopy'] = {}
             settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.use_multiview
             settings['output_props']['stereoscopy']['views_format'] = bpy.context.scene.render.views_format
-            settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.views["left"].use
-            settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.views["right"].use
-            settings['output_props']['stereoscopy']['use_multiview'] = bpy.context.scene.render.views["left"].camera_suffix
+            settings['output_props']['stereoscopy']['use_left'] = bpy.context.scene.render.views["left"].use
+            settings['output_props']['stereoscopy']['use_right'] = bpy.context.scene.render.views["right"].use
+            settings['output_props']['stereoscopy']['left_suffix'] = bpy.context.scene.render.views["left"].camera_suffix
+            settings['output_props']['stereoscopy']['right_suffix'] = bpy.context.scene.render.views["right"].camera_suffix
 
             # Output Properties - Output
             settings['output_props']['output'] = {}
@@ -326,10 +329,12 @@ class SaveButtonOperator(bpy.types.Operator):
                 settings['output_props']['metadata']['stamp_foreground'] = self.colorToString(bpy.context.scene.render.stamp_foreground)
                 settings['output_props']['metadata']['stamp_background'] = self.colorToString(bpy.context.scene.render.stamp_background)
                 settings['output_props']['metadata']['use_stamp_labels'] = bpy.context.scene.render.use_stamp_labels
+
+            # Post Processing
             settings['output_props']['post_processing'] = {}
-            settings['output_props']['post_processing']['use_compositing'] = bpy.context.scene.render.use_compositing = False
-            settings['output_props']['post_processing']['use_sequencer'] = bpy.context.scene.render.use_sequencer = False
-            settings['output_props']['post_processing']['dither_intensity'] = bpy.context.scene.render.dither_intensity = 0.776119
+            settings['output_props']['post_processing']['use_compositing'] = bpy.context.scene.render.use_compositing
+            settings['output_props']['post_processing']['use_sequencer'] = bpy.context.scene.render.use_sequencer
+            settings['output_props']['post_processing']['dither_intensity'] = bpy.context.scene.render.dither_intensity
 
             #======================
             # View Layer Properties
@@ -380,11 +385,11 @@ class SaveButtonOperator(bpy.types.Operator):
 
             # View Layer Properties - Filter
             settings['viewlayer_props']['filter'] = {}
-            settings['viewlayer_props']['filter']['use_sky'] = bpy.context.scene.view_layers["ViewLayer"].use_sky = False
-            settings['viewlayer_props']['filter']['use_solid'] = bpy.context.scene.view_layers["ViewLayer"].use_solid = False
-            settings['viewlayer_props']['filter']['use_strand'] = bpy.context.scene.view_layers["ViewLayer"].use_strand = False
-            settings['viewlayer_props']['filter']['use_volumes'] = bpy.context.scene.view_layers["ViewLayer"].use_volumes = False
-            settings['viewlayer_props']['filter']['use_motion_blur'] = bpy.context.scene.view_layers["ViewLayer"].use_motion_blur = False
+            settings['viewlayer_props']['filter']['use_sky'] = bpy.context.scene.view_layers["ViewLayer"].use_sky
+            settings['viewlayer_props']['filter']['use_solid'] = bpy.context.scene.view_layers["ViewLayer"].use_solid
+            settings['viewlayer_props']['filter']['use_strand'] = bpy.context.scene.view_layers["ViewLayer"].use_strand
+            settings['viewlayer_props']['filter']['use_volumes'] = bpy.context.scene.view_layers["ViewLayer"].use_volumes
+            settings['viewlayer_props']['filter']['use_motion_blur'] = bpy.context.scene.view_layers["ViewLayer"].use_motion_blur
             # settings['viewlayer_props']['filter']['use_denoising'] = bpy.data.scenes["Scene"].(null)
 
             # View Layer Properties - Override
@@ -484,8 +489,8 @@ class SaveButtonOperator(bpy.types.Operator):
             # Collection Properties
             settings['collection_props'] = {}
             settings['collection_props']['restrictions'] = {}
-            settings['collection_props']['restrictions']['hide_select'] = bpy.data.collections["Collection"].hide_select = True
-            settings['collection_props']['restrictions']['hide_render'] = bpy.data.collections["Collection"].hide_render = True
+            settings['collection_props']['restrictions']['hide_select'] = bpy.data.collections["Collection"].hide_select
+            settings['collection_props']['restrictions']['hide_render'] = bpy.data.collections["Collection"].hide_render
             # settings['collection_props']['restrictions']['holdout'] = bpy.data.scenes["Scene"].(null)
             # settings['collection_props']['restrictions']['indirect_only'] = bpy.data.scenes["Scene"].(null)
             settings['collection_props']['instancing'] = {}
