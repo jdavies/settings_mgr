@@ -19,7 +19,7 @@
 bl_info = {
     "name": "Settings Manager",
     "author": "Jeff Davies - Cybernautic Studios",
-    "version": (0, 0, 2),
+    "version": (0, 0, 3),
     "blender": (3, 4, 1),
     "location": "View3D",
     "description": "Saves the Blender settings for easy loading in other projects",
@@ -40,7 +40,6 @@ bl_info = {
 # I found this routine in DECALMachin3. Great for
 # fully reloading all modules in the addon!
 def reload_modules(name):
-
     import os
     import importlib
 
@@ -54,12 +53,16 @@ def reload_modules(name):
     #     exec(impline)
     #     importlib.reload(eval(module))
 
+    print("reload_modules called!")
+
+    from . import app_properties
+    importlib.reload(app_properties)
+
     from . import settings_mgr
     importlib.reload(settings_mgr)
 
     from . import save_button_operator
     importlib.reload(save_button_operator)
-    print("reload_modules called!")
 
     from . import load_button_operator
     importlib.reload(load_button_operator)
@@ -106,6 +109,7 @@ from bpy.utils import register_class, unregister_class
 from random import randint
 from bpy.props import (StringProperty, PointerProperty, BoolProperty, FloatProperty, IntProperty)
 from bpy.types import (Panel, Operator, PropertyGroup)
+from . import app_properties
 from . import settings_mgr
 from . import save_button_operator
 from . import load_button_operator
@@ -117,95 +121,29 @@ print(bl_info)
 print("update avail: " + str(updater.isUpdateAvailable(bl_info['version'])))
 for p in sys.path:
     print(p)
-    
-# Define our custom properties
-class MyProperties(PropertyGroup):
-    save_filename: StringProperty(
-        name="Save As",
-        description="The name of the settings file you want to save. Do not add a file extension",
-        default="",
-        maxlen=1024,
-        )
-        
-    load_filename: StringProperty(
-        name="Load File",
-        description="The name of the settings file you want to load.",
-        default="",
-        maxlen=1024
-        )
-
-    # ================================
-    # Load Preferences - Render - Main
-    # ================================
-    
-    load_pref_workspace : BoolProperty(
-        name = "Use Workspace settings",
-        description = "Load the workspace properties",
-        default = True
-        )
-
-    load_pref_render : BoolProperty(
-        name = "Use Render settings",
-        description = "Load the render properties",
-        default = True
-        )
-
-    load_pref_output : BoolProperty(
-        name = "Use Output settings",
-        description = "Load the output properties",
-        default = True
-        )
-
-    load_pref_view_layer : BoolProperty(
-        name = "Use View Layer settings",
-        description = "Load the view  layer properties",
-        default = True
-        )
-
-    load_pref_scene : BoolProperty(
-        name = "Use Scene settings",
-        description = "Load the scene properties",
-        default = True
-        )
-
-    load_pref_world : BoolProperty(
-        name = "Use World settings",
-        description = "Load the world properties",
-        default = True
-        )
-    
-    load_pref_collection : BoolProperty(
-        name = "Use Collection settings",
-        description = "Load the collection properties",
-        default = True
-        )
-
-    load_pref_texture : BoolProperty(
-        name = "Use Texture settings",
-        description = "Load the texture properties",
-        default = True
-        )
-
-
 
 _classes = [
+    app_properties.AppProperties,
+    settings_mgr.NPanel,
     save_button_operator.SaveButtonOperator,
     load_button_operator.LoadButtonOperator,
     operator_file_import.ImportSomeData,
-    MyProperties,
-    settings_mgr.NPanel,
 ]
 
 def register():
     for cls in _classes:
         register_class(cls)
     # Register our properties
-    bpy.types.Scene.my_props = PointerProperty(type=MyProperties)
+    bpy.types.Scene.my_props = PointerProperty(type=app_properties.AppProperties)
+    # bpy.types.Context.my_props = PointerProperty(type=app_properties.AppProperties)
 
 
 def unregister():
     for cls in _classes:
         unregister_class(cls)
+        print("Unregistering " + cls)
+    del bpy.types.Scene.my_props
+    # del bpy.types.Context.my_props
 
 
 if __name__ == "__main__":
