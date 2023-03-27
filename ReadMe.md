@@ -32,3 +32,7 @@ I am considering adding the following to the Settings Manager addon in the futur
 ### v0.0.1 - 2023-03-17
 
 Initial release. Still not feature complete but I wanted to get it onto Github!
+
+### v0.0.3 - 2023-03-27
+
+Functionality for Cycles is complete. Now to get EEVEE working
