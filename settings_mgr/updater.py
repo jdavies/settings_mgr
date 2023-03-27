@@ -6,7 +6,7 @@ import urllib.request
 def isUpdateAvailable(currentVersionTuple):
     print("checking for updates...")
     result = False   # Default to no update
-    with urllib.request.urlopen('https://raw.githubusercontent.com/jdavies/settings_mgr/master/settings_mgr/version.txt') as response:
+    with urllib.request.urlopen('https://raw.githubusercontent.com/jdavies/settings_mgr/master/version.txt') as response:
         html = response.read()
         latestVersionTuple = html.decode('UTF-8').split('.')
         # Convert to an integer
