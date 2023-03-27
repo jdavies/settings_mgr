@@ -6,15 +6,17 @@ import urllib.request
 def isUpdateAvailable(currentVersionTuple):
     print("checking for updates...")
     result = False   # Default to no update
-    with urllib.request.urlopen('https://raw.githubusercontent.com/jdavies/settings_mgr/master/version.txt') as response:
-        html = response.read()
-        latestVersionTuple = html.decode('UTF-8').split('.')
-        # Convert to an integer
-        latestVersion = int(latestVersionTuple[0]) * 100 + int(latestVersionTuple[1]) * 10 + int(latestVersionTuple[2])
-        currentVersion = int(currentVersionTuple[0]) * 100 + int(currentVersionTuple[1]) * 10 + int(currentVersionTuple[2])
-        print("comparing " + str(latestVersion) + " = " + str(latestVersion) + " to " + str(currentVersion) + " - " + str(currentVersionTuple))
-        result = latestVersion > currentVersion
-        print("   Result: " + str(result))
+    try:
+        with urllib.request.urlopen('https://raw.githubusercontent.com/jdavies/settings_mgr/master/version.txt') as response:
+            html = response.read()
+            latestVersionTuple = html.decode('UTF-8').split('.')
+            # Convert to an integer
+            latestVersion = int(latestVersionTuple[0]) * 100 + int(latestVersionTuple[1]) * 10 + int(latestVersionTuple[2])
+            currentVersion = int(currentVersionTuple[0]) * 100 + int(currentVersionTuple[1]) * 10 + int(currentVersionTuple[2])
+            print("comparing " + str(latestVersion) + " = " + str(latestVersion) + " to " + str(currentVersion) + " - " + str(currentVersionTuple))
+            print("   Result: " + str(result))
+    except:
+        print("An error occures checking for an update.")
     return result
 
 if __name__ == "__main__":
