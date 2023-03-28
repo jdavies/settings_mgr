@@ -21,4 +21,7 @@ Notes to myself since I always for get the details of this process!
 
 ## Releasing the addon
 
-1. Update the version numbers in the **settings_mgr/__init__.py** and the **make.bat** files
+1. Update the version numbers in the **settings_mgr/__init__.py**, the **make.bat** and the **version.txt** files.
+1. Commit everything to the local Git repository on my machine.
+1. Push all changes to the remote Git repo (Push  / Pull -> Snc)
+1. Add a tag for the release
