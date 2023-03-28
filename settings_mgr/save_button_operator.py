@@ -328,8 +328,8 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['metadata']['use_stamp'] = bpy.context.scene.render.use_stamp
             if bpy.context.scene.render.use_stamp == True:
                 settings['output_props']['metadata']['stamp_font_size'] = bpy.context.scene.render.stamp_font_size
-                settings['output_props']['metadata']['stamp_foreground'] = self.colorToString(bpy.context.scene.render.stamp_foreground)
-                settings['output_props']['metadata']['stamp_background'] = self.colorToString(bpy.context.scene.render.stamp_background)
+                settings['output_props']['metadata']['stamp_foreground'] = self.colorAlphaToString(bpy.context.scene.render.stamp_foreground)
+                settings['output_props']['metadata']['stamp_background'] = self.colorAlphaToString(bpy.context.scene.render.stamp_background)
                 settings['output_props']['metadata']['use_stamp_labels'] = bpy.context.scene.render.use_stamp_labels
 
             # Post Processing
@@ -669,6 +669,7 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['render_props']['freestyle']['line_thickness_mode'] = bpy.context.scene.render.line_thickness_mode
             settings['render_props']['freestyle']['line_thickness'] = bpy.context.scene.render.line_thickness
             # Color Management
+            settings['render_props']['color_management'] = {}
             settings['render_props']['color_management']['display_device'] = bpy.context.scene.display_settings.display_device
             settings['render_props']['color_management']['view_transform'] = bpy.context.scene.view_settings.view_transform
             settings['render_props']['color_management']['look'] = bpy.context.scene.view_settings.look
@@ -716,8 +717,13 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['output']['views_format'] = bpy.context.scene.render.image_settings.views_format
             # TODO
             # settings['output_props']['output']['stereo_mode'] = bpy.data.scenes["Scene"].(null) = 'INTERLACE'
+
+            # TODO Should work but doesn't  recognize bpy.context.scene.colorspace_settings.name
             settings['output_props']['output']['color_management'] = bpy.context.scene.render.image_settings.color_management
-            settings['output_props']['output']['name'] = bpy.context.scene.colorspace_settings.name
+            # if(bpy.context.scene.render.image_settings.color_management == 'OVERRIDE'):
+            #     # This attribute is only available if  the color mgt is set to OVERRIDE
+            #     settings['output_props']['output']['name'] = bpy.context.scene.colorspace_settings.name
+
             # Metadata
             settings['output_props']['metadata'] = {}
             settings['output_props']['metadata']['metadata_input'] = bpy.context.scene.render.metadata_input
@@ -739,8 +745,12 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['output_props']['metadata']['use_stamp'] = bpy.context.scene.render.use_stamp
             if bpy.context.scene.render.use_stamp == True:
                 settings['output_props']['metadata']['stamp_font_size'] = bpy.context.scene.render.stamp_font_size
-                settings['output_props']['metadata']['stamp_foreground'] = self.colorToString(bpy.context.scene.render.stamp_foreground)
-                settings['output_props']['metadata']['stamp_background'] = self.colorToString(bpy.context.scene.render.stamp_background)
+                print("---> stamp_foreground = ")
+                print(bpy.context.scene.render.stamp_foreground)
+                print("---> stamp_background = ")
+                print(bpy.context.scene.render.stamp_background)
+                settings['output_props']['metadata']['stamp_foreground'] = self.colorAlphaToString(bpy.context.scene.render.stamp_foreground)
+                settings['output_props']['metadata']['stamp_background'] = self.colorAlphaToString(bpy.context.scene.render.stamp_background)
                 settings['output_props']['metadata']['use_stamp_labels'] = bpy.context.scene.render.use_stamp_labels
             # Post Processing
             settings['output_props']['post_processing'] = {}
@@ -787,6 +797,8 @@ class SaveButtonOperator(bpy.types.Operator):
 
             settings['viewlayer_props']['passes']['freestyle'] = {}
             settings['viewlayer_props']['passes']['freestyle']['use_freestyle'] = bpy.context.scene.view_layers["ViewLayer"].use_freestyle
+            settings['viewlayer_props']['passes']['freestyle']['lineset'] = {}
+            settings['viewlayer_props']['passes']['freestyle']['lineset']['linestyle'] = bpy.data.linestyles["LineStyle"].name = "LineStyle"
             # TODO - The rest of the Freestyle section I don't understand
 
             # ===================
@@ -889,12 +901,24 @@ class SaveButtonOperator(bpy.types.Operator):
 
     # Convert a color from Blender into a string
     def colorToString(self, color):
-        print('colorToString received:')
-        print(color)
+        # print('colorToString received:')
+        # print(color)
         # colorStr = '#%02x%02x%02x' % color
         # print('colorStr = ' + colorStr)
         colorStr = str(color[0]) + ',' + str(color[1]) + ',' + str(color[2])
-        print('colorStr2 = ' + colorStr)
+        # print('colorStr2 = ' + colorStr)
         result = '(' + colorStr + ')'
-        print('colorToString returning: ' + result)
+        # print('colorToString returning: ' + result)
+        return result
+
+    # Convert a color with an alpha channel from Blender into a string
+    def colorAlphaToString(self, colorAlpha):
+        # print('colorAlphaToString received:')
+        # print(colorAlpha)
+        # colorStr = '#%02x%02x%02x' % color
+        # print('colorStr = ' + colorStr)
+        colorAlphaStr = str(colorAlpha[0]) + ',' + str(colorAlpha[1]) + ',' + str(colorAlpha[2]) + ',' + str(colorAlpha[3])
+        # print("colorAlphaStr = " + colorAlphaStr)
+        result = '(' + colorAlphaStr + ')'
+        # print('colorAlphaToString returning: ' + result)
         return result

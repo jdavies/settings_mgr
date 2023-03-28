@@ -1,6 +1,7 @@
 import bpy
 import json
 import os
+from array import *
 
 # Get the operator for the button
 class LoadButtonOperator(bpy.types.Operator):
@@ -706,7 +707,10 @@ class LoadButtonOperator(bpy.types.Operator):
         # TODO
         # self.data['output_props']['output']['stereo_mode'] = bpy.data.scenes["Scene"].(null) = 'INTERLACE'
         bpy.context.scene.render.image_settings.color_management = self.data['output_props']['output']['color_management']
-        bpy.context.scene.colorspace_settings.name = self.data['output_props']['output']['name']
+        # if(bpy.context.scene.render.image_settings.color_management == 'OVERRIDE'):
+        #     # TODO This doesn't work yet.
+        #     bpy.context.scene.colorspace_settings.name = self.data['output_props']['output']['name']
+
         # Metadata
         bpy.context.scene.render.metadata_input = self.data['output_props']['metadata']['metadata_input']
         bpy.context.scene.render.use_stamp_date = self.data['output_props']['metadata']['use_stamp_date']
@@ -727,8 +731,8 @@ class LoadButtonOperator(bpy.types.Operator):
         bpy.context.scene.render.use_stamp = self.data['output_props']['metadata']['use_stamp']
         if bpy.context.scene.render.use_stamp == True:
             bpy.context.scene.render.stamp_font_size = self.data['output_props']['metadata']['stamp_font_size']
-            bpy.context.scene.render.stamp_foreground = self.stringToColor(self.data['output_props']['metadata']['stamp_foreground'])
-            bpy.context.scene.render.stamp_background = self.stringToColor(self.data['output_props']['metadata']['stamp_background'])
+            bpy.context.scene.render.stamp_foreground = self.stringToColorAlpha(self.data['output_props']['metadata']['stamp_foreground'])
+            bpy.context.scene.render.stamp_background = self.stringToColorAlpha(self.data['output_props']['metadata']['stamp_background'])
             bpy.context.scene.render.use_stamp_labels = self.data['output_props']['metadata']['use_stamp_labels']
         # Post Processing
         bpy.context.scene.render.use_compositing = self.data['output_props']['post_processing']['use_compositing']
@@ -858,3 +862,21 @@ class LoadButtonOperator(bpy.types.Operator):
         # print("final color")
         # print(color)
         return color
+
+    # Convert a colorAlpha string from the JSON file "(1.0, 1.0, 1.0, 1.0)" into a Blender bpy_float[4] array
+    def stringToColorAlpha(self, colorAlphaString):
+        # print("colorAlphaString = " + colorAlphaString)
+        temp = colorAlphaString.strip("()")
+        # print("temp  = " + temp)
+        strArray = temp.split(',')
+        # print("strArray =")
+        # print(strArray)
+
+        colorAlpha = array('f', [0.0,  0.0, 0.0, 0.0])
+        colorAlpha[0] = float(strArray[0])
+        colorAlpha[1] = float(strArray[1])
+        colorAlpha[2] = float(strArray[2])
+        colorAlpha[3] = float(strArray[3])
+        # print("final color w/ alpha")
+        # print(colorAlpha)
+        return colorAlpha
