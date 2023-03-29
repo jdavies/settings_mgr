@@ -19,7 +19,7 @@
 bl_info = {
     "name": "Settings Manager",
     "author": "Jeff Davies - Cybernautic Studios",
-    "version": (0, 0, 4),
+    "version": (0, 0, 5),
     "blender": (3, 4, 1),
     "location": "View3D",
     "description": "Saves the Blender settings for easy loading in other projects",
