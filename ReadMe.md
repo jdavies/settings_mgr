@@ -36,3 +36,7 @@ Initial release. Still not feature complete but I wanted to get it onto Github!
 ### v0.0.3 - 2023-03-27
 
 Functionality for Cycles is complete. Now to get EEVEE working
+
+### v0.0.4 - 2023-03-28
+
+Functionality for Eevee is complete. There needs to be alot of testing for all of thre conditional settings in Blender

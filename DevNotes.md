@@ -22,6 +22,10 @@ Notes to myself since I always for get the details of this process!
 ## Releasing the addon
 
 1. Update the version numbers in the **settings_mgr/__init__.py**, the **make.bat** and the **version.txt** files.
+1. Update the release notes in **ReadMe.md**
 1. Commit everything to the local Git repository on my machine.
 1. Push all changes to the remote Git repo (Push  / Pull -> Snc)
-1. Add a tag for the release
+1. Create a release: Add a tag for the release using the Giuthub web UI, not VS Code's Git extension.
+![Where to add a new tag](./images/create_tag_1.png)
+1. Be sure to press the Enter key when you create the tag an not just click outside of the box.
+![Creating the release](./images/create_tag_2.png)
