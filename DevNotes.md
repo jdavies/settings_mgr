@@ -17,11 +17,11 @@ The root folder holds the utility files for building the addon.
 
 ## Comitting to Github
 
-Notes to myself since I always for get the details of this process!
+Notes to myself since I always forget the details of this process!
 
 ## Releasing the addon
 
-1. Update the version numbers in the **settings_mgr/__init__.py**, the **make.bat** and the **version.txt** files.
+1. Update the version numbers in the **settings_mgr/\_\_init\_\_.py**, the **make.bat** and the **version.txt** files.
 1. Update the release notes in **ReadMe.md**
 1. Commit everything to the local Git repository on my machine.
 1. Push all changes to the remote Git repo (Push  / Pull -> Sync)
