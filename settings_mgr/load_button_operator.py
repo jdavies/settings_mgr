@@ -2,6 +2,7 @@ import bpy
 import json
 import os
 from array import *
+from pprint  import pprint
 
 # Get the operator for the button
 class LoadButtonOperator(bpy.types.Operator):
@@ -53,7 +54,7 @@ class LoadButtonOperator(bpy.types.Operator):
             self.loadCycles(context)
         else:
             # Load the EEVEE self.data
-            self.loadEevee(context)
+            self.loadEevee(thisfile, context)
         if(self.data['output_props']['metadata']['use_stamp_note']):
             bpy.context.scene.render.use_stamp_note = True
             bpy.context.scene.render.stamp_note_text = self.data['output_props']['metadata']['stamp_note_text']
@@ -73,8 +74,8 @@ class LoadButtonOperator(bpy.types.Operator):
         context.scene.cycles.feature_set = self.data['render_props']['feature_set']
         # print("my_props:")
         # print(list(my_props.keys()))
-        if(my_props.load_pref_render == True):
-            self.loadCyclesRenderProps(my_props)
+        # if(my_props.load_pref_render == True):
+        self.loadCyclesRenderProps(my_props)
 
         # ====================
         # Workspace Properties
@@ -227,7 +228,7 @@ class LoadButtonOperator(bpy.types.Operator):
         bpy.context.scene.cycles.denoiser = self.data['render_props']['sampling']['render']['denoiser']
         bpy.context.scene.cycles.denoising_prefilter = self.data['render_props']['sampling']['render']['denoising_prefilter']
         bpy.context.scene.cycles.seed = self.data['render_props']['sampling']['advanced']['seed']
-        bpy.context.scene.cycles.sampling_pattern = self.data['render_props']['sampling']['advanced']['sampling_pattern']
+        # bpy.context.scene.cycles.sampling_pattern = self.data['render_props']['sampling']['advanced']['sampling_pattern']
         bpy.context.scene.cycles.sample_offset = self.data['render_props']['sampling']['advanced']['sample_offset']
         bpy.context.scene.cycles.auto_scrambling_distance = self.data['render_props']['sampling']['advanced']['auto_scrambling_distance']
         bpy.context.scene.cycles.preview_scrambling_distance = self.data['render_props']['sampling']['advanced']['preview_scrambling_distance']
@@ -273,11 +274,12 @@ class LoadButtonOperator(bpy.types.Operator):
         bpy.context.scene.render.use_crop_to_border = self.data['output_props']['format']['crop_to_render_region']
 
         # Frame Range
-        bpy.context.scene.frame_start = self.data['output_props']['frame_range']['frame_start']
-        bpy.context.scene.frame_end = self.data['output_props']['frame_range']['frame_end']
-        bpy.context.scene.frame_step = self.data['output_props']['frame_range']['frame_step']
-        bpy.context.scene.render.frame_map_old = self.data['output_props']['frame_range']['frame_map_old']
-        bpy.context.scene.render.frame_map_new = self.data['output_props']['frame_range']['frame_map_new']
+        if(my_props.load_pref_overwrite_frame_range == True):
+            bpy.context.scene.frame_start = self.data['output_props']['frame_range']['frame_start']
+            bpy.context.scene.frame_end = self.data['output_props']['frame_range']['frame_end']
+            bpy.context.scene.frame_step = self.data['output_props']['frame_range']['frame_step']
+            bpy.context.scene.render.frame_map_old = self.data['output_props']['frame_range']['frame_map_old']
+            bpy.context.scene.render.frame_map_new = self.data['output_props']['frame_range']['frame_map_new']
 
         # Metadata
         bpy.context.scene.render.metadata_input = self.data['output_props']['metadata']['metadata_input']
@@ -304,7 +306,24 @@ class LoadButtonOperator(bpy.types.Operator):
             bpy.context.scene.render.use_stamp_labels = self.data['output_props']['metadata']['use_stamp_labels']
 
         # Output Properties - Output
-        bpy.context.scene.render.filepath = self.data['output_props']['output']['filepath']
+        # Get the current file name
+        filename = bpy.path.basename(bpy.data.filepath)
+        filename = os.path.splitext(filename)[0]
+        print("Current file name:")
+        print(filename)
+        # Test to see if the output filepath is "escaped"
+        if "[model]" in self.data['output_props']['output']['filepath']:
+            # Yes, it is  escaped. Substitute the string TODO!!!
+            print("Original output file path:")
+            print(self.data['output_props']['output']['filepath'])
+            new_path = self.data['output_props']['output']['filepath'].replace("[model]", filename)
+            print("New output filepath:")
+            print(new_path)
+            bpy.context.scene.render.filepath = new_path
+        else:
+            # No, it is not escaped. Use it "as is"
+            bpy.context.scene.render.filepath = self.data['output_props']['output']['filepath']
+
         bpy.context.scene.render.use_file_extension = self.data['output_props']['output']['use_file_extension']
         bpy.context.scene.render.use_render_cache = self.data['output_props']['output']['use_render_cache']
         bpy.context.scene.render.image_settings.file_format = self.data['output_props']['output']['file_format']
@@ -457,7 +476,7 @@ class LoadButtonOperator(bpy.types.Operator):
         # self.data['world_props']['mist_pass']['start'] = bpy.context.scene.world.mist_settings.start
         # self.data['world_props']['mist_pass']['depth'] = bpy.context.scene.world.mist_settings.depth
         # self.data['world_props']['mist_pass']['falloff'] = bpy.context.scene.world.mist_settings.falloff
-        bpy.context.scene.world.cycles_visibility.camera = self.data['world_props']['ray_visibility']['camera']
+        # bpy.context.scene.world.cycles_visibility.camera = self.data['world_props']['ray_visibility']['camera']
         bpy.context.scene.world.cycles_visibility.diffuse = self.data['world_props']['ray_visibility']['diffuse']
         bpy.context.scene.world.cycles_visibility.glossy = self.data['world_props']['ray_visibility']['glossy']
         bpy.context.scene.world.cycles_visibility.transmission = self.data['world_props']['ray_visibility']['transmission']
@@ -552,8 +571,8 @@ class LoadButtonOperator(bpy.types.Operator):
         #======================
         # Collection Properties
         #======================
-        if(my_props.load_pref_collection == True):
-            self.loadEeveeCollectionProps(my_props)
+        # if(my_props.load_pref_collection == True):
+        #     self.loadEeveeCollectionProps(my_props)
 
     def loadEeveeWorkspaceProps(self, props):
         bpy.context.scene.tool_settings.use_transform_data_origin = self.data['workspace']['options']['transform']['use_transform_data_origin']

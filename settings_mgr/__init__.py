@@ -19,11 +19,11 @@
 bl_info = {
     "name": "Settings Manager",
     "author": "Jeff Davies - Cybernautic Studios",
-    "version": (0, 0, 5),
+    "version": (0, 0, 6),
     "blender": (3, 4, 1),
     "location": "View3D",
     "description": "Saves the Blender settings for easy loading in other projects",
-    "warning": "Tested only with Blender v3.4.1",
+    "warning": "Tested with Blender v3.4.1 through 3.5.1",
     "doc_url": "",
     "category": "System",
 }

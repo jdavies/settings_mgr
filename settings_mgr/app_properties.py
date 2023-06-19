@@ -9,6 +9,7 @@ class AppProperties(PropertyGroup):
     load_filename: StringProperty(name="Load File", description="The name of the settings file you want to load.", default="", maxlen=128)
     load_dummy: StringProperty(name="Dummy Prop", description="The name of the settings file you want to load.", default="foobar", maxlen=128)
     load_pref_workspace: BoolProperty(name = "Use Workspace settings", description = "Load the workspace properties", default = True)
+    load_pref_overwrite_frame_range: BoolProperty(name = "Ovberwrite  Framme Range", description = "Overwirte the files current frame range settings with the values in the load file.", default = True)
     load_pref_render: BoolProperty(name="Use Render settings", description = "Load the render properties", default = True)
     load_pref_output: BoolProperty(name="Use Output settings", description = "Load the output properties", default = True)
 
@@ -17,6 +18,8 @@ class AppProperties(PropertyGroup):
         description = "Load the view  layer properties",
         default = True
         )
+
+    # output_filename: StringProperty(name="Output File", description="The path and filename of the rendered files. Use [model] to substitute the filename of the model as the output name. Example: //exr/[model]_####", default="foobar", maxlen=128)
 
     load_pref_scene : BoolProperty(
         name = "Use Scene settings",

@@ -5,8 +5,8 @@
 To quickly reload the changes you've made to the addon while testing:
 
 1. Save your file in Visual Code
-1. Execute the copyFile.bat file
-1. In Blender, press the Blender icon in the upper-left corner and select *System -> Reload Scripts*
+1. Execute the copyFile.bat file: '.\copyFile.bat'
+1. In Blender, press the Blender icon in the upper-left corner and select *System -> Reload Scripts*  Give it a moment to finish
 
 ## Project File Structure
 
@@ -14,6 +14,13 @@ The root folder holds the utility files for building the addon.
 **settings_mgr/** contains the source code.
 **test/** Contains scratchpad code I use for testing things in pure python. It has nothng to do with the addon.
 **copyFile.bat** simply copies the files into the Blender addon folder. See Updating the addon as a blender developer for it's use.
+**make.bat** Creates the ZIP file for the Blender addon.
+
+## Key Source Files
+
+**settings_mgr/__init__.py** Defines the addon version and high level info.
+**settings_mgr/app_properties.py** Defines the addon properties.
+**settings_mgr/settings_mgr.py** Defines the layout of the addon in the  N-panel.
 
 ## Comitting to Github
 

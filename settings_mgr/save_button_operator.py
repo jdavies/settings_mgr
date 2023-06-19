@@ -1,6 +1,43 @@
 import bpy
 import json
 import os
+import array
+from pprint import pprint
+from types import FunctionType
+from inspect import getmembers
+
+def api(obj):
+    return [name for name in dir(obj) if name[0] != '_']
+
+def attrs(obj):
+    disallowed_properties = {
+        name for name, value in getmembers(type(obj)) 
+        if isinstance(value, (property, FunctionType))
+    }
+    return {
+        name: getattr(obj, name) for name in api(obj) 
+        if name not in disallowed_properties and hasattr(obj, name)
+    }
+
+# Hurray for recursion!
+# Need to add input node tree
+def parseNodeTree(depth):
+    node = {}
+    node['depth'] = depth
+    node['children'] = []
+    if(depth > 1):
+        node['children'].append(parseNodeTreeChild(depth-1))
+    return node
+
+#  Parse the children of the current node, if any
+def parseNodeTreeChild(depth):
+    node = {}
+    node['depth'] = depth
+    node['children'] = []
+    if(depth > 1):
+        node['children'].append(parseNodeTreeChild(depth-1))
+    return node
+
 
 
 class SaveButtonOperator(bpy.types.Operator):
@@ -18,7 +55,7 @@ class SaveButtonOperator(bpy.types.Operator):
 
         # Does any directory info exist in the current save file name?
         osdir = os.path.dirname(context.scene.my_props.save_filename)
-        # print('os.path.dirname RAW = ' + osdir)
+        print('os.path.dirname RAW = ' + osdir)
         if(osdir == ''):
             # No directory information is given. Assume the local directory for the file
             # print("osdir == ''")
@@ -36,7 +73,7 @@ class SaveButtonOperator(bpy.types.Operator):
             # Looks like a different directory has been specified
             fn = bpy.path.abspath(context.scene.my_props.save_filename)
 
-        # print('fn = ' + fn)
+        print('fn = ' + fn)
         fn = bpy.path.ensure_ext(fn, '.json', case_sensitive=False)
         # print('adj filename = ' + fn)
 
@@ -451,68 +488,124 @@ class SaveButtonOperator(bpy.types.Operator):
             #=================
             # World Properties
             #=================
-            settings['world_props'] = {}
+            settings['world_props'] = []
+            # There may be multiple worlds defined, so this needs to be a dictionary of worlds
             # World Properties - Surface
-            settings['world_props']['surface'] = {}
+            worldArray = []
+            # settings['world_props']['surface'] = {}
+            print("Saving worlds...")
+            worldIndex = 0
+            for world in bpy.data.worlds:
+                worldObj = {}
+                worldObj['name'] = world.name
+                print("|--- world " + str(worldIndex) + ": " + world.name)
+                pprint(attrs(world), indent=3)
+                print(world)
+                worldObj['surface'] = {}
+
+                worldObj['nodeTest'] = parseNodeTree(3)
+
+                # What type of node is set for the surface?
+                # bpy.data.worlds[world.name].node_tree.nodes["Translucent BSDF"]
+                print("|------ world surface")
+                nodes = parseNodeTree(3)
+                # nodeIndex = 0
+                # for node in bpy.data.worlds[world.name].node_tree.nodes:
+                #     print("        |------ node: " + node.name + " - " + str(nodeIndex))
+                #     nodeObj = {}
+                #     pprint(attrs(node), indent=9)
+                #     nodeObj['name'] = node.name
+                #     nodeObj['type'] = node.type
+                #     worldObj['surface']['distribution'] = node.distribution
+                #     worldObj['surface']['subsurface_method'] = node.subsurface_method
+
+                #     nodeIndex  += 1
+
+                #     outputIndex = 0
+                #     worldObj['surface']['outputs'] = {}
+                #     for output in node.outputs:
+                #         print("              |------ outputs: " + output.name + " - " + str(outputIndex))
+                #         worldObj['surface']['outputs']['name'] = output.name
+                #         pprint(attrs(output), indent=9)
+                #         nodeIndex  += 1
+                # # settings['world_props'][world.name]['surface']['surface'] = bpy.data.worlds[world.name].node_tree.nodes["Translucent BSDF"].inputs[0].default_value
+                # pprint(attrs(bpy.data.worlds[world.name].node_tree.nodes), indent=3)
+                # for node in bpy.data.worlds[world.name].node_tree.nodes:
+                #     print('|------node name = ' + node.name)
+                #     pprint(attrs(node), indent=6)
+                worldIndex += 1
+                worldArray.append(worldObj)
+            settings['world_props'] = worldArray
             # TBD
             # settings['world_props']['surface']['surface'] = bpy.data.worlds["World"].node_tree.nodes["Translucent BSDF"].inputs[0].default_value
             # settings['world_props']['surface']['color'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[0].default_value
             # settings['world_props']['surface']['strength'] = bpy.data.worlds["World"].node_tree.nodes["Background"].inputs[1].default_value
             # World Properties - Volume
-            settings['world_props']['volume'] = {}
+            # settings['world_props']['volume'] = {}
             # TBD - Its not clear to me how to get/set this data reliably.
 
             # settings['world_props']['mist_pass'] = {}
             # settings['world_props']['mist_pass']['start'] = bpy.context.scene.world.mist_settings.start
             # settings['world_props']['mist_pass']['depth'] = bpy.context.scene.world.mist_settings.depth
             # settings['world_props']['mist_pass']['falloff'] = bpy.context.scene.world.mist_settings.falloff
-            settings['world_props']['ray_visibility'] = {}
-            settings['world_props']['ray_visibility']['camera'] = bpy.context.scene.world.cycles_visibility.camera
-            settings['world_props']['ray_visibility']['diffuse'] = bpy.context.scene.world.cycles_visibility.diffuse
-            settings['world_props']['ray_visibility']['glossy'] = bpy.context.scene.world.cycles_visibility.glossy
-            settings['world_props']['ray_visibility']['transmission'] = bpy.context.scene.world.cycles_visibility.transmission
-            settings['world_props']['ray_visibility']['scatter'] = bpy.context.scene.world.cycles_visibility.scatter
-            settings['world_props']['settings'] = {}
-            settings['world_props']['settings']['surface'] = {}
-            settings['world_props']['settings']['surface']['sampling_method'] = bpy.context.scene.world.cycles.sampling_method
-            settings['world_props']['settings']['surface']['sample_map_resolution'] = bpy.context.scene.world.cycles.sample_map_resolution
-            settings['world_props']['settings']['surface']['max_bounces'] = bpy.context.scene.world.cycles.max_bounces
-            settings['world_props']['settings']['surface']['is_caustics_light'] = bpy.context.scene.world.cycles.is_caustics_light
-            settings['world_props']['settings']['volume'] = {}
-            settings['world_props']['settings']['volume']['volume_sampling'] = bpy.context.scene.world.cycles.volume_sampling
-            settings['world_props']['settings']['volume']['volume_interpolation'] = bpy.context.scene.world.cycles.volume_interpolation
-            settings['world_props']['settings']['volume']['homogeneous_volume'] = bpy.context.scene.world.cycles.homogeneous_volume
-            settings['world_props']['settings']['volume']['volume_step_size'] = bpy.context.scene.world.cycles.volume_step_size
-            settings['world_props']['settings']['light_group'] = {} # TBD FUTURE
-            settings['world_props']['settings']['viewport_display'] = {}
-            settings['world_props']['settings']['viewport_display']['color'] = self.colorToString(bpy.context.scene.world.color)
-            settings['world_props']['custom_properties'] = {} # TBD FUTURE
+            # settings['world_props']['ray_visibility'] = {}
+            # settings['world_props']['ray_visibility']['camera'] = bpy.context.scene.world.cycles_visibility.camera
+            # settings['world_props']['ray_visibility']['diffuse'] = bpy.context.scene.world.cycles_visibility.diffuse
+            # settings['world_props']['ray_visibility']['glossy'] = bpy.context.scene.world.cycles_visibility.glossy
+            # settings['world_props']['ray_visibility']['transmission'] = bpy.context.scene.world.cycles_visibility.transmission
+            # settings['world_props']['ray_visibility']['scatter'] = bpy.context.scene.world.cycles_visibility.scatter
+            # settings['world_props']['settings'] = {}
+            # settings['world_props']['settings']['surface'] = {}
+            # settings['world_props']['settings']['surface']['sampling_method'] = bpy.context.scene.world.cycles.sampling_method
+            # settings['world_props']['settings']['surface']['sample_map_resolution'] = bpy.context.scene.world.cycles.sample_map_resolution
+            # settings['world_props']['settings']['surface']['max_bounces'] = bpy.context.scene.world.cycles.max_bounces
+            # settings['world_props']['settings']['surface']['is_caustics_light'] = bpy.context.scene.world.cycles.is_caustics_light
+            # settings['world_props']['settings']['volume'] = {}
+            # settings['world_props']['settings']['volume']['volume_sampling'] = bpy.context.scene.world.cycles.volume_sampling
+            # settings['world_props']['settings']['volume']['volume_interpolation'] = bpy.context.scene.world.cycles.volume_interpolation
+            # settings['world_props']['settings']['volume']['homogeneous_volume'] = bpy.context.scene.world.cycles.homogeneous_volume
+            # settings['world_props']['settings']['volume']['volume_step_size'] = bpy.context.scene.world.cycles.volume_step_size
+            # settings['world_props']['settings']['light_group'] = {} # TBD FUTURE
+            # settings['world_props']['settings']['viewport_display'] = {}
+            # settings['world_props']['settings']['viewport_display']['color'] = self.colorToString(bpy.context.scene.world.color)
+            # settings['world_props']['custom_properties'] = {} # TBD FUTURE
 
             # Collection Properties
-            settings['collection_props'] = {}
-            settings['collection_props']['restrictions'] = {}
-            settings['collection_props']['restrictions']['hide_select'] = bpy.data.collections["Collection"].hide_select
-            settings['collection_props']['restrictions']['hide_render'] = bpy.data.collections["Collection"].hide_render
-            # settings['collection_props']['restrictions']['holdout'] = bpy.data.scenes["Scene"].(null)
-            # settings['collection_props']['restrictions']['indirect_only'] = bpy.data.scenes["Scene"].(null)
-            settings['collection_props']['instancing'] = {}
-            settings['collection_props']['instancing']['instance_offset_x'] = bpy.data.collections["Collection"].instance_offset[0]
-            settings['collection_props']['instancing']['instance_offset_y'] = bpy.data.collections["Collection"].instance_offset[1]
-            settings['collection_props']['instancing']['instance_offset_z'] = bpy.data.collections["Collection"].instance_offset[2]
-            settings['collection_props']['line_art'] = {}
-            settings['collection_props']['line_art']['lineart_usage'] = bpy.data.collections["Collection"].lineart_usage
-            settings['collection_props']['line_art']['lineart_use_intersection_mask'] = bpy.data.collections["Collection"].lineart_use_intersection_mask
-            # if the use_lineart_intersection_masks is checked, then these are valid
-            settings['collection_props']['line_art']['lineart_intersection_mask_0'] = bpy.data.collections["Collection"].lineart_intersection_mask[0]
-            settings['collection_props']['line_art']['lineart_intersection_mask_1'] = bpy.data.collections["Collection"].lineart_intersection_mask[1]
-            settings['collection_props']['line_art']['lineart_intersection_mask_2'] = bpy.data.collections["Collection"].lineart_intersection_mask[2]
-            settings['collection_props']['line_art']['lineart_intersection_mask_3'] = bpy.data.collections["Collection"].lineart_intersection_mask[3]
-            settings['collection_props']['line_art']['lineart_intersection_mask_4'] = bpy.data.collections["Collection"].lineart_intersection_mask[4]
-            settings['collection_props']['line_art']['lineart_intersection_mask_5'] = bpy.data.collections["Collection"].lineart_intersection_mask[5]
-            settings['collection_props']['line_art']['lineart_intersection_mask_6'] = bpy.data.collections["Collection"].lineart_intersection_mask[6]
-            settings['collection_props']['line_art']['lineart_intersection_mask_7'] = bpy.data.collections["Collection"].lineart_intersection_mask[7]
-            settings['collection_props']['line_art']['use_lineart_intersection_priority'] = bpy.data.collections["Collection"].use_lineart_intersection_priority
-            settings['collection_props']['line_art']['lineart_intersection_priority'] = bpy.data.collections["Collection"].lineart_intersection_priority
+            # print("$$$$$$$$ listing collections and their objects...")
+            # for collection in bpy.data.collections:
+            #     print("cycles: " + collection.name)
+            #     # pprint(vars(collection))
+            #     pprint(attrs(collection), indent=3)
+            #     rnaType = collection.rna_type
+            #     pprint(attrs(rnaType), indent=6)
+            #     # print(attrs(collection))
+            #     for obj in collection.all_objects:
+            #         print("obj: ", obj.name)
+            # settings['collection_props'] = {}
+            # settings['collection_props']['restrictions'] = {}
+            # settings['collection_props']['restrictions']['hide_select'] = bpy.data.collections["Collection"].hide_select
+            # settings['collection_props']['restrictions']['hide_render'] = bpy.data.collections["Collection"].hide_render
+            # settings['collection_props']['restrictions']['hide_render'] = bpy.data.collections["Collection"].hide_viewport
+            # # settings['collection_props']['restrictions']['holdout'] = bpy.data.scenes["Scene"].(null)
+            # # settings['collection_props']['restrictions']['indirect_only'] = bpy.data.scenes["Scene"].(null)
+            # settings['collection_props']['instancing'] = {}
+            # settings['collection_props']['instancing']['instance_offset_x'] = bpy.data.collections["Collection"].instance_offset[0]
+            # settings['collection_props']['instancing']['instance_offset_y'] = bpy.data.collections["Collection"].instance_offset[1]
+            # settings['collection_props']['instancing']['instance_offset_z'] = bpy.data.collections["Collection"].instance_offset[2]
+            # settings['collection_props']['line_art'] = {}
+            # settings['collection_props']['line_art']['lineart_usage'] = bpy.data.collections["Collection"].lineart_usage
+            # settings['collection_props']['line_art']['lineart_use_intersection_mask'] = bpy.data.collections["Collection"].lineart_use_intersection_mask
+            # # if the use_lineart_intersection_masks is checked, then these are valid
+            # settings['collection_props']['line_art']['lineart_intersection_mask_0'] = bpy.data.collections["Collection"].lineart_intersection_mask[0]
+            # settings['collection_props']['line_art']['lineart_intersection_mask_1'] = bpy.data.collections["Collection"].lineart_intersection_mask[1]
+            # settings['collection_props']['line_art']['lineart_intersection_mask_2'] = bpy.data.collections["Collection"].lineart_intersection_mask[2]
+            # settings['collection_props']['line_art']['lineart_intersection_mask_3'] = bpy.data.collections["Collection"].lineart_intersection_mask[3]
+            # settings['collection_props']['line_art']['lineart_intersection_mask_4'] = bpy.data.collections["Collection"].lineart_intersection_mask[4]
+            # settings['collection_props']['line_art']['lineart_intersection_mask_5'] = bpy.data.collections["Collection"].lineart_intersection_mask[5]
+            # settings['collection_props']['line_art']['lineart_intersection_mask_6'] = bpy.data.collections["Collection"].lineart_intersection_mask[6]
+            # settings['collection_props']['line_art']['lineart_intersection_mask_7'] = bpy.data.collections["Collection"].lineart_intersection_mask[7]
+            # settings['collection_props']['line_art']['use_lineart_intersection_priority'] = bpy.data.collections["Collection"].use_lineart_intersection_priority
+            # settings['collection_props']['line_art']['lineart_intersection_priority'] = bpy.data.collections["Collection"].lineart_intersection_priority
 
             # Object Properties - Future
             settings['object_props'] = {}
@@ -870,6 +963,13 @@ class SaveButtonOperator(bpy.types.Operator):
             settings['world_props']['custom_properties'] = {} # TBD FUTURE
 
             # Collection Properties
+            print("$$$$$$$$ listing collections and their objects...")
+            for collection in bpy.data.collections:
+                print(collection.name)
+                pprint(vars(collection))
+                for obj in collection.all_objects:
+                    print("obj: ", obj.name)
+
             settings['collection_props'] = {}
             settings['collection_props']['restrictions'] = {}
             settings['collection_props']['restrictions']['hide_select'] = bpy.data.collections["Collection"].hide_select
@@ -922,3 +1022,5 @@ class SaveButtonOperator(bpy.types.Operator):
         result = '(' + colorAlphaStr + ')'
         # print('colorAlphaToString returning: ' + result)
         return result
+
+    

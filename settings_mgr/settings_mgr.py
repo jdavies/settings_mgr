@@ -34,6 +34,8 @@ class NPanel(BasePanel, bpy.types.Panel):
         box = layout.box()
         box.label(text = "Save Settings")
         #layout.prop(my_props, "save_filename")
+        # row = box.row()
+        # row.prop(my_props, "output_filename")
         row = box.row()
         row.prop(my_props, "save_filename")
         saveFileOp = row.operator(ImportSomeData.bl_idname, text="", icon='FILEBROWSER')
@@ -45,6 +47,9 @@ class NPanel(BasePanel, bpy.types.Panel):
         box.label(text = "Load Settings")
 
         row = box.row()
+        row.prop(my_props, "load_pref_overwrite_frame_range")
+
+        row = box.row()
         row.prop(my_props, "load_pref_workspace")
         row.prop(my_props, "load_pref_render")
         row = box.row()
@@ -53,12 +58,9 @@ class NPanel(BasePanel, bpy.types.Panel):
         row = box.row()
         row.prop(my_props, "load_pref_scene")
         row.prop(my_props, "load_pref_world")
-        row = box.row()
-        row.prop(my_props, "load_pref_collection")
-        row.prop(my_props, "load_pref_texture")
-
-        row = box.row()
-        row.prop(my_props, "load_dummy")
+        # row = box.row()
+        # row.prop(my_props, "load_pref_collection")
+        # row.prop(my_props, "load_pref_texture")
         
         row = box.row()
         row.prop(my_props, "load_filename")
